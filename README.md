@@ -110,3 +110,7 @@ The total supply of HHCWToken is set at 1,000,000,000 tokens, with 18 decimal pl
     <img src="https://img.shields.io/badge/Linktree-39E09B?style=flat&logo=linktree&logoColor=white" alt="Linktree">
   </a>
 </p>
+
+### License
+
+Wristkey is distributed under the terms of the MIT. See the [license](LICENSE) for more information.
