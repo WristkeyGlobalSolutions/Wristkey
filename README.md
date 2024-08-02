@@ -1,7 +1,8 @@
 <div align="center">
   <img src=".github/images/wristkey.jpeg"/>
-  <h1>Wristkey Global Solutions</h1>
 </div>
+
+# Wristkey Global Solutions
 
 <div align="center">
 <img src=".github/images/wristkey_overview.jpeg"/>
