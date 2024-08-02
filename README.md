@@ -1,5 +1,5 @@
 <div align="center">
-  <img src=".github/images/wristkey.jpeg" alt="Wristkey Global Solutions Logo" width="100"/>
+  <img src=",github\images\wristkey.jpeg" alt="Wristkey Global Solutions Logo" width="100"/>
   <h1 style="display: inline-block; vertical-align: middle;">Wristkey Global Solutions</h1>
 </div>
 
