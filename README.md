@@ -21,7 +21,7 @@
 
 **Key features and innovations:** The ecosystem includes biometric authentication, 2FA, smart contract integration, and unique hardware accessories designed to enhance security and user experience.
 
-<div style="display:flex;">
+<div style="display:flex; align:center;">
 <img src=",github\images\wristkey1.jpeg" width="30%" style="flex:1" />
 <img src=",github\images\wristkey2.jpeg" width="30%" style="flex:1" />
 <img src=",github\images\wristkey3.jpeg" width="30%" style="flex:1" />
@@ -44,7 +44,7 @@
 - **👥 Everyday users:** People looking for a secure and convenient way to manage digital assets.
 - **🏦 Financial institutions:** Banks and financial organizations interested in integrating cryptocurrency solutions.
 
-<div style="display:flex;">
+<div style="display:flex; align:center;">
 <img src=",github\images\wristkey_app1.jpeg" width="45%" style="flex:1" />
 <img src=",github\images\wristkey_app2.jpeg" width="45%" style="flex:1" />
 </div>
