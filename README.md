@@ -4,7 +4,7 @@
 </div>
 
 <div align="center">
-<img src=".github/images/wristkey_overview"/>
+<img src=",github\images\wristkey_overview.jpeg"/>
 </div>
 
 ## Introduction
@@ -22,9 +22,9 @@
 **Key features and innovations:** The ecosystem includes biometric authentication, 2FA, smart contract integration, and unique hardware accessories designed to enhance security and user experience.
 
 <div style="display:flex;">
-<img src=".github/images/wristkey1.jpeg" width="30%" style="flex:1" />
-<img src=".github/images/wristkey2.jpeg" width="30%" style="flex:1" />
-<img src=".github/images/wristkey3.jpeg" width="30%" style="flex:1" />
+<img src=".github\images\wristkey1.jpeg" width="30%" style="flex:1" />
+<img src=".github\images\wristkey2.jpeg" width="30%" style="flex:1" />
+<img src=".github\images\wristkey3.jpeg" width="30%" style="flex:1" />
 </div>
 
 ### Objectives
@@ -45,8 +45,8 @@
 - **🏦 Financial institutions:** Banks and financial organizations interested in integrating cryptocurrency solutions.
 
 <div style="display:flex;">
-<img src=".github/images/wristkey_app1.jpeg" width="45%" style="flex:1" />
-<img src=".github/images/wristkey_app2.jpeg" width="45%" style="flex:1" />
+<img src=".github\images\wristkey_app1.jpeg" width="45%" style="flex:1" />
+<img src=".github\images\wristkey_app2.jpeg" width="45%" style="flex:1" />
 </div>
 
 ## Product Description
@@ -82,9 +82,9 @@ The total supply of HHCWToken is set at 1,000,000,000 tokens, with 18 decimal pl
 - **Marketing and Community:** 10% (100,000,000 HHCWToken) This allocation is dedicated to marketing initiatives, community-building efforts, and partnerships. It aims to drive awareness, user acquisition, and engagement within the HHCW community.
 - **Reserve Fund:** 5% (50,000,000 HHCWToken) The reserve fund is set aside to ensure liquidity, support market stability, and address any unforeseen circumstances that may arise during the project's lifecycle.
 
-![Tokenomics](mnt/data/Screenshot%202024-08-02%20205442.png)
+<!-- ![Tokenomics](mnt/data/Screenshot%202024-08-02%20205442.png)
 ![Tokenomics](mnt/data/Screenshot%202024-08-02%20205452.png)
-![Tokenomics](mnt/data/Screenshot%202024-08-02%20205426.png)
+![Tokenomics](mnt/data/Screenshot%202024-08-02%20205426.png) -->
 
 ## Additional Links
 
@@ -109,12 +109,3 @@ The total supply of HHCWToken is set at 1,000,000,000 tokens, with 18 decimal pl
     <img src="https://img.shields.io/badge/Linktree-39E09B?style=flat&logo=linktree&logoColor=white" alt="Linktree">
   </a>
 </p>
-
-<div align="center">
-<img src=".github/images/phone/deviceframes.png"/>
-<img src=".github/images/tv/playlist.png"/>
-</div>
-<div style="display:flex;">
-<img src=".github/images/tv/foryou.png" width="45%" style="flex:1" />
-<img src=".github/images/tv/player.png" width="45%" style="flex:1" />
-</div>
