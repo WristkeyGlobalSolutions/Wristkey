@@ -1,6 +1,6 @@
 <div align="center">
-  <img src=",github\images\wristkey.jpeg" alt="Wristkey Global Solutions Logo" width="100"/>
-  <h1 style="display: inline-block; vertical-align: middle;">Wristkey Global Solutions</h1>
+  <img src=",github\images\wristkey.jpeg" width="50%" height="50%" alt="Wristkey Global Solutions Logo"/>
+  <h1>Wristkey Global Solutions</h1>
 </div>
 
 <div align="center">
