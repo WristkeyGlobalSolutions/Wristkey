@@ -1,4 +1,11 @@
-# Wristkey Global Solutions
+<div align="center">
+  <img src=".github/images/wristkey.jpeg" alt="Wristkey Global Solutions Logo"/>
+  <h1>Wristkey Global Solutions</h1>
+</div>
+
+<div align="center">
+<img src=".github/images/wristkey_overview"/>
+</div>
 
 ## Introduction
 **Overview of the current state of cryptocurrency wallet solutions:** Existing cryptocurrency wallet solutions often face challenges such as security vulnerabilities, complex user interfaces, and limited integration with hardware accessories. These issues hinder widespread adoption and user confidence.
@@ -13,6 +20,12 @@
 **Description of the wallet protocol ecosystem:** Wristkey Global Solutions offers a comprehensive wallet ecosystem featuring both cold and soft wallets, along with innovative hardware accessories such as NFC rings, smartwatch wallets, and credit card wallets.
 
 **Key features and innovations:** The ecosystem includes biometric authentication, 2FA, smart contract integration, and unique hardware accessories designed to enhance security and user experience.
+
+<div style="display:flex;">
+<img src=".github/images/wristkey1.jpeg" width="30%" style="flex:1" />
+<img src=".github/images/wristkey2.jpeg" width="30%" style="flex:1" />
+<img src=".github/images/wristkey3.jpeg" width="30%" style="flex:1" />
+</div>
 
 ### Objectives
 - **💪 Empowerment of individuals:** Our goal is to make cryptocurrency accessible to everyone, enhancing financial inclusion.
@@ -30,6 +43,11 @@
 - **🔐 Crypto enthusiasts:** Individuals deeply invested in cryptocurrency.
 - **👥 Everyday users:** People looking for a secure and convenient way to manage digital assets.
 - **🏦 Financial institutions:** Banks and financial organizations interested in integrating cryptocurrency solutions.
+
+<div style="display:flex;">
+<img src=".github/images/wristkey_app1.jpeg" width="45%" style="flex:1" />
+<img src=".github/images/wristkey_app2.jpeg" width="45%" style="flex:1" />
+</div>
 
 ## Product Description
 
@@ -91,3 +109,12 @@ The total supply of HHCWToken is set at 1,000,000,000 tokens, with 18 decimal pl
     <img src="https://img.shields.io/badge/Linktree-39E09B?style=flat&logo=linktree&logoColor=white" alt="Linktree">
   </a>
 </p>
+
+<div align="center">
+<img src=".github/images/phone/deviceframes.png"/>
+<img src=".github/images/tv/playlist.png"/>
+</div>
+<div style="display:flex;">
+<img src=".github/images/tv/foryou.png" width="45%" style="flex:1" />
+<img src=".github/images/tv/player.png" width="45%" style="flex:1" />
+</div>
