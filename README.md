@@ -45,8 +45,8 @@
 - **🏦 Financial institutions:** Banks and financial organizations interested in integrating cryptocurrency solutions.
 
 <div style="display:flex;">
-<img src=".github\images\wristkey_app1.jpeg" width="45%" style="flex:1" />
-<img src=".github\images\wristkey_app2.jpeg" width="45%" style="flex:1" />
+<img src=",github\images\wristkey_app1.jpeg" width="45%" style="flex:1" />
+<img src=",github\images\wristkey_app2.jpeg" width="45%" style="flex:1" />
 </div>
 
 ## Product Description
@@ -57,7 +57,7 @@
 **Hardware accessories:** We offer NFC rings, smartwatch wallets, and credit card wallets, each designed for secure and convenient access to digital assets.
 
 ## Roadmap
-![Roadmap](mnt/data/Screenshot%202024-08-02%20205400.png)
+<!-- ![Roadmap](mnt/data/Screenshot%202024-08-02%20205400.png) -->
 
 ### Phase 1
 Conduct market research, form a skilled team, prepare a comprehensive whitepaper, and engage with the community for feedback.
