@@ -70,12 +70,24 @@ The total supply of HHCWToken is set at 1,000,000,000 tokens, with 18 decimal pl
 
 ## Additional Links
 
-<a href="https://coinmarketcap.com/dexscan/polygon/0x6e43d7cdfde1cab8bc11c0b0d9b16a0751ab9811/"><img src="https://img.shields.io/badge/CoinMarketCap-1E1F26?style=flat&logo=coinmarketcap&logoColor=white" alt="CoinMarketCap"></a>
-
-<a href="http://linkedin.com/in/gabriel-covington-12a12915b"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
-
-<a href="http://www.hiphopcryptowatch.com"><img src="https://img.shields.io/badge/Blog-FF4500?style=flat&logo=blog&logoColor=white" alt="#1 Crypto Market Blog"></a>
-
-<a href="https://promocards.byspotify.com/api/share/82e2627e-d175-4d2e-982d-833e7de5d3dc"><img src="https://img.shields.io/badge/Podcast-1DB954?style=flat&logo=spotify&logoColor=white" alt="Podcast"></a>
-
-<a href="https://linktr.ee/Hiphopnftzcrypto"><img src="https://img.shields.io/badge/Linktree-39E09B?style=flat&logo=linktree&logoColor=white" alt="Linktree"></a>
+<p align="left">
+  <a href="https://coinmarketcap.com/dexscan/polygon/0x6e43d7cdfde1cab8bc11c0b0d9b16a0751ab9811/">
+    <img src="https://img.shields.io/badge/CoinMarketCap-1E1F26?style=flat&logo=coinmarketcap&logoColor=white" alt="CoinMarketCap">
+  </a>
+  <br>
+  <a href="http://linkedin.com/in/gabriel-covington-12a12915b">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white" alt="LinkedIn">
+  </a>
+  <br>
+  <a href="http://www.hiphopcryptowatch.com">
+    <img src="https://img.shields.io/badge/Blog-FF4500?style=flat&logo=blog&logoColor=white" alt="#1 Crypto Market Blog">
+  </a>
+  <br>
+  <a href="https://promocards.byspotify.com/api/share/82e2627e-d175-4d2e-982d-833e7de5d3dc">
+    <img src="https://img.shields.io/badge/Podcast-1DB954?style=flat&logo=spotify&logoColor=white" alt="Podcast">
+  </a>
+  <br>
+  <a href="https://linktr.ee/Hiphopnftzcrypto">
+    <img src="https://img.shields.io/badge/Linktree-39E09B?style=flat&logo=linktree&logoColor=white" alt="Linktree">
+  </a>
+</p>
