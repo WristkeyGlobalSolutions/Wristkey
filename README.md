@@ -15,9 +15,9 @@
 **Key features and innovations:** The ecosystem includes biometric authentication, 2FA, smart contract integration, and unique hardware accessories designed to enhance security and user experience.
 
 ### Objectives
-- **Empowerment of individuals:** Our goal is to make cryptocurrency accessible to everyone, enhancing financial inclusion.
-- **Enhancing security and accessibility:** We focus on providing top-notch security and a user-friendly experience.
-- **Seamless integration within the Polygon network:** We chose Polygon for its scalability, efficiency, and low transaction costs.
+- **💪 Empowerment of individuals:** Our goal is to make cryptocurrency accessible to everyone, enhancing financial inclusion.
+- **🔒 Enhancing security and accessibility:** We focus on providing top-notch security and a user-friendly experience.
+- **🔗 Seamless integration within the Polygon network:** We chose Polygon for its scalability, efficiency, and low transaction costs.
 
 ## Market Analysis
 
@@ -27,9 +27,9 @@
 **Market demand for secure and user-friendly wallet systems:** There is a growing demand for wallet systems that offer enhanced security, ease of use, and innovative features.
 
 ### Target Audience
-- **Crypto enthusiasts:** Individuals deeply invested in cryptocurrency.
-- **Everyday users:** People looking for a secure and convenient way to manage digital assets.
-- **Financial institutions:** Banks and financial organizations interested in integrating cryptocurrency solutions.
+- **🔐 Crypto enthusiasts:** Individuals deeply invested in cryptocurrency.
+- **👥 Everyday users:** People looking for a secure and convenient way to manage digital assets.
+- **🏦 Financial institutions:** Banks and financial organizations interested in integrating cryptocurrency solutions.
 
 ## Product Description
 
@@ -69,8 +69,13 @@ The total supply of HHCWToken is set at 1,000,000,000 tokens, with 18 decimal pl
 ![Tokenomics](mnt/data/Screenshot%202024-08-02%20205426.png)
 
 ## Additional Links
-- [CoinMarketCap](https://coinmarketcap.com/dexscan/polygon/0x6e43d7cdfde1cab8bc11c0b0d9b16a0751ab9811/)
-- [LinkedIn](http://linkedin.com/in/gabriel-covington-12a12915b)
-- [#1 Crypto Market Blog](http://www.hiphopcryptowatch.com)
-- [Podcast](https://promocards.byspotify.com/api/share/82e2627e-d175-4d2e-982d-833e7de5d3dc)
-- [Linktree](https://linktr.ee/Hiphopnftzcrypto)
+
+<a href="https://coinmarketcap.com/dexscan/polygon/0x6e43d7cdfde1cab8bc11c0b0d9b16a0751ab9811/"><img src="https://img.shields.io/badge/CoinMarketCap-1E1F26?style=flat&logo=coinmarketcap&logoColor=white" alt="CoinMarketCap"></a>
+
+<a href="http://linkedin.com/in/gabriel-covington-12a12915b"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+
+<a href="http://www.hiphopcryptowatch.com"><img src="https://img.shields.io/badge/Blog-FF4500?style=flat&logo=blog&logoColor=white" alt="#1 Crypto Market Blog"></a>
+
+<a href="https://promocards.byspotify.com/api/share/82e2627e-d175-4d2e-982d-833e7de5d3dc"><img src="https://img.shields.io/badge/Podcast-1DB954?style=flat&logo=spotify&logoColor=white" alt="Podcast"></a>
+
+<a href="https://linktr.ee/Hiphopnftzcrypto"><img src="https://img.shields.io/badge/Linktree-39E09B?style=flat&logo=linktree&logoColor=white" alt="Linktree"></a>
