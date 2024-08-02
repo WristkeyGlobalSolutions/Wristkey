@@ -1,10 +1,10 @@
 <div align="center">
-  <img src=".github\images\wristkey.jpeg" alt="Wristkey Global Solutions Logo"/>
+  <img src=".github/images/wristkey.jpeg" alt="Wristkey Global Solutions Logo"/>
   <h1>Wristkey Global Solutions</h1>
 </div>
 
 <div align="center">
-<img src=",github\images\wristkey_overview.jpeg"/>
+<img src=".github/images/wristkey_overview.jpeg"/>
 </div>
 
 ## Introduction
@@ -22,9 +22,9 @@
 **Key features and innovations:** The ecosystem includes biometric authentication, 2FA, smart contract integration, and unique hardware accessories designed to enhance security and user experience.
 
 <div style="display:flex; align:center;">
-<img src=",github\images\wristkey1.jpeg" width="30%" style="flex:1" />
-<img src=",github\images\wristkey2.jpeg" width="30%" style="flex:1" />
-<img src=",github\images\wristkey3.jpeg" width="30%" style="flex:1" />
+<img src=".github/images/wristkey1.jpeg" width="30%" style="flex:1" />
+<img src=".github/images/wristkey2.jpeg" width="30%" style="flex:1" />
+<img src=".github/images/wristkey3.jpeg" width="30%" style="flex:1" />
 </div>
 
 ### Objectives
@@ -45,8 +45,8 @@
 - **🏦 Financial institutions:** Banks and financial organizations interested in integrating cryptocurrency solutions.
 
 <div style="display:flex; align:center;">
-<img src=",github\images\wristkey_app1.jpeg" width="45%" style="flex:1" />
-<img src=",github\images\wristkey_app2.jpeg" width="45%" style="flex:1" />
+<img src=".github/images/wristkey_app1.jpeg" width="45%" style="flex:1" />
+<img src=".github/images/wristkey_app2.jpeg" width="45%" style="flex:1" />
 </div>
 
 ## Product Description
