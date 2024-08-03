@@ -1,5 +1,5 @@
   <div class="display: flex; align-items: center; justify-content: center;">
-    <img src=".github/images/wristkey.jpeg" alt="Wristkey Global Solutions" class="width: 100px; height: auto; margin-right: 20px;"/>
+    <img src=".github/images/wristkey.jpeg" alt="Wristkey Global Solutions" width="10%" class="width: 100px; height: auto; margin-right: 20px;"/>
     <h1 class="font-size: 2em;">Wristkey Global Solutions</h1>
   </div>
 
