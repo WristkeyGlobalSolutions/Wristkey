@@ -1,8 +1,9 @@
-<div align="center">
-  <img src=".github/images/wristkey.jpeg" alt="Wristkey Global Solutions"/>
-</div>
+  <div class="display: flex; align-items: center; justify-content: center;">
+    <img src=".github/images/wristkey.jpeg" alt="Wristkey Global Solutions" class="width: 100px; height: auto; margin-right: 20px;"/>
+    <h1 class="font-size: 2em;">Wristkey Global Solutions</h1>
+  </div>
 
-# Wristkey Global Solutions
+# 
 
 <div align="center">
 <img src=".github/images/wristkey_overview.jpeg"/>
