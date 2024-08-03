@@ -24,8 +24,8 @@
 
 <div style="display:flex; align:center;">
 <img src=".github/images/wristkey1.jpeg" width="30%" style="flex:1" />
+<img src=".github/images/wristkey4.jpeg" width="30%" style="flex:1" />
 <img src=".github/images/wristkey2.jpeg" width="30%" style="flex:1" />
-<img src=".github/images/wristkey3.jpeg" width="30%" style="flex:1" />
 </div>
 
 ### Objectives
@@ -58,7 +58,6 @@
 **Hardware accessories:** We offer NFC rings, smartwatch wallets, and credit card wallets, each designed for secure and convenient access to digital assets.
 
 ## Roadmap
-<!-- ![Roadmap](mnt/data/Screenshot%202024-08-02%20205400.png) -->
 
 ### Phase 1
 Conduct market research, form a skilled team, prepare a comprehensive whitepaper, and engage with the community for feedback.
@@ -82,10 +81,6 @@ The total supply of HHCWToken is set at 1,000,000,000 tokens, with 18 decimal pl
 - **Platform Development:** 20% (200,000,000 HHCWToken) These tokens are allocated to fund the ongoing development, enhancement, and maintenance of the HHCW1.0 platform. The allocation ensures continuous innovation and scalability to meet the needs of the growing community.
 - **Marketing and Community:** 10% (100,000,000 HHCWToken) This allocation is dedicated to marketing initiatives, community-building efforts, and partnerships. It aims to drive awareness, user acquisition, and engagement within the HHCW community.
 - **Reserve Fund:** 5% (50,000,000 HHCWToken) The reserve fund is set aside to ensure liquidity, support market stability, and address any unforeseen circumstances that may arise during the project's lifecycle.
-
-<!-- ![Tokenomics](mnt/data/Screenshot%202024-08-02%20205442.png)
-![Tokenomics](mnt/data/Screenshot%202024-08-02%20205452.png)
-![Tokenomics](mnt/data/Screenshot%202024-08-02%20205426.png) -->
 
 ## Additional Links
 
