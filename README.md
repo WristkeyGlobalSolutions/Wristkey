@@ -107,7 +107,7 @@ The total supply of HHCWToken is set at 1,000,000,000 tokens, with 18 decimal pl
 </p>
 
 <div align="center">
-  <a href="https://hj5cy4us7b5.typeform.com/to/h7yV9HiC" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #4CAF50; text-align: center; text-decoration: none; border-radius: 5px;">
+  <a href="https://hj5cy4us7b5.typeform.com/to/h7yV9HiC" style="display: inline-block; padding: 20px 40px; font-size: 20px; color: #fff; background-color: #4CAF50; text-align: center; text-decoration: none; border-radius: 10px;">
     Give Feedback
   </a>
 </div>
