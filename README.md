@@ -5,7 +5,7 @@
 # Wristkey Global Solutions
 
 <div align="center">
-<img src=".github/images/wristkey_overview.jpeg" alt="Wristkey Overview"/>
+<img src=".github/images/wristkey_overview.jpeg"/>
 </div>
 
 ## Introduction
@@ -22,10 +22,10 @@
 
 **Key features and innovations:** The ecosystem includes biometric authentication, 2FA, smart contract integration, and unique hardware accessories designed to enhance security and user experience.
 
-<div align="center" style="display:flex; justify-content: center;">
-  <img src=".github/images/wristkey1.jpeg" width="30%" alt="Wristkey Image 1"/>
-  <img src=".github/images/wristkey4.jpeg" width="30%" alt="Wristkey Image 4"/>
-  <img src=".github/images/wristkey2.jpeg" width="30%" alt="Wristkey Image 2"/>
+<div style="display:flex; align:center;">
+<img src=".github/images/wristkey1.jpeg" width="30%" style="flex:1" />
+<img src=".github/images/wristkey4.jpeg" width="30%" style="flex:1" />
+<img src=".github/images/wristkey2.jpeg" width="30%" style="flex:1" />
 </div>
 
 ### Objectives
@@ -45,9 +45,9 @@
 - **👥 Everyday users:** People looking for a secure and convenient way to manage digital assets.
 - **🏦 Financial institutions:** Banks and financial organizations interested in integrating cryptocurrency solutions.
 
-<div align="center" style="display:flex; justify-content: center;">
-  <img src=".github/images/wristkey_app1.jpeg" width="45%" height="75%" alt="Wristkey App 1"/>
-  <img src=".github/images/wristkey_app2.jpeg" width="45%" height="75%" alt="Wristkey App 2"/>
+<div style="display:flex; align:center;">
+<img src=".github/images/wristkey_app1.jpeg" width="45%" height="75%" style="flex:1" />
+<img src=".github/images/wristkey_app2.jpeg" width="45%" height="75%" style="flex:1" />
 </div>
 
 ## Product Description
@@ -107,11 +107,9 @@ The total supply of HHCWToken is set at 1,000,000,000 tokens, with 18 decimal pl
 </p>
 
 <div align="center">
-<Button>
   <a href="https://hj5cy4us7b5.typeform.com/to/h7yV9HiC" style="display: inline-block; padding: 20px 40px; font-size: 20px; color: #fff; background-color: #4CAF50; text-align: center; text-decoration: none; border-radius: 10px;">
-    [Give Feedback]
+    <img src=".github/images/feedback-wristkey.png" width="45%" height="75%" style="flex:1" />
   </a>
-  </Button>
 </div>
 
 ### License
