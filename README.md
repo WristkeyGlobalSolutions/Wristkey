@@ -106,6 +106,8 @@ The total supply of HHCWToken is set at 1,000,000,000 tokens, with 18 decimal pl
   </a>
 </p>
 
+## Wristkey Global Solutions - Feedback and Insights
+
 <div align="center">
   <a href="https://hj5cy4us7b5.typeform.com/to/h7yV9HiC" style="display: inline-block; padding: 20px 40px; font-size: 20px; color: #fff; background-color: #4CAF50; text-align: center; text-decoration: none; border-radius: 10px;">
     <img src=".github/images/feedback-wristkey.png" width="45%" height="75%" style="flex:1" />
