@@ -1,25 +1,26 @@
 import { ethers, Wallet } from 'ethers';
+import { provider, network, ETHSCAN_KEY, ETHERSCAN_URL} from '@/utils/network';
 
 //const POLYGON_RPC = 'https://rpc-mumbai.maticvigil.com';
-const POLYGON_RPC = 'https://polygon-rpc.com';
-const ETHSCAN_KEY = "E3WIWE6CM7M8ACACG8G3863JF9B7GY9Q3U";
 
-let provider : ethers.JsonRpcProvider;
-let network : Promise<ethers.Network>;
 let smart_contracts : ethers.Contract[] = [];
 let wallet_addresses : string[] = [];
 
 //const CONTRACT_ADDRESS = 'your_contract_address';
 //const ABI: ethers.Interface | ethers.InterfaceAbi = [/* contract ABI */];
 
-/*
-export const getSigner = () => {
-   if (typeof window !== 'undefined' && (window as any).ethereum) {
-      const provider = new ethers.BrowserProvider((window as any).ethereum);
-     return provider.getSigner();
-   }
-   return null;
+//This was in here prior
+export function getSigner() 
+{
+    if (typeof window !== 'undefined' && (window as any).ethereum) 
+    {
+        const provider = new ethers.BrowserProvider((window as any).ethereum);
+        return provider.getSigner();
+    }
+    return null;
 };
+
+/*
 
 export const getContract = async () => 
 {
@@ -30,9 +31,11 @@ export const getContract = async () =>
 */
 
 //Utility Methods
+
+//Would we even need this? Is the ABI provided by default?
 async function getABI(contractAddress : string | ethers.Addressable)
 {
-    const url = `https://api.etherscan.io/api?module=contract&action=getabi&address=${contractAddress}&apikey=${ETHSCAN_KEY}`;
+    const url = ETHERSCAN_URL + `?module=contract&action=getabi&address=${contractAddress}&apikey=${ETHSCAN_KEY}`;
     let ABI : ethers.InterfaceAbi = [];
 
     try
@@ -57,9 +60,10 @@ async function getABI(contractAddress : string | ethers.Addressable)
     return ABI;
 }
 
-//Contract Sotrage
+//Adds the contract to a local variable
 function addContract(contract : ethers.Contract)
 {
+    //TODO: Grab Contracts from cloud
     if(smart_contracts.length == 0)
     {
         smart_contracts.push(contract);
@@ -73,16 +77,18 @@ function addContract(contract : ethers.Contract)
     });  
     
     smart_contracts.push(contract);
+    //TODO: Upload new contracts to cloud
 }
 
+//Removes the contract from a local variable
 function removeContract(contract_or_address : ethers.Contract | Promise<string>)
 {
+    //TODO: Grab Contracts from cloud
     if(smart_contracts.length == 0)
     {
         return;
     }
     
-    //Remove the contract(s) from the list
     if(contract_or_address instanceof ethers.Contract)
     {
         smart_contracts = smart_contracts.filter(stored_contract => stored_contract.getAddress() == contract_or_address.getAddress());
@@ -91,17 +97,12 @@ function removeContract(contract_or_address : ethers.Contract | Promise<string>)
     {
         smart_contracts = smart_contracts.filter(stored_contract => stored_contract.getAddress() == contract_or_address);
     }
+
+    //TODO: Upload new contracts to cloud
 }
 
-export const connectNetwork = async () =>
-{
-    provider = new ethers.JsonRpcProvider(POLYGON_RPC);
-    network = provider.getNetwork();
-
-    return (await network).chainId.toString();
-}
-
-export const connectWallet = async () =>
+//Connects a wallet via Metamask / etherium extention
+export async function connectWalletViaExtention()
 {
     if(typeof window.ethereum !== "undefined") 
     {
@@ -127,7 +128,6 @@ export const getWallets = async () =>
 {
     return wallet_addresses;
 }
-
 
 function addWallet(wallet_address : string)
 {

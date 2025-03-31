@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@safe-global/protocol-kit": "^5.2.4",
+    "axios": "^1.8.4",
     "ethers": "^6.13.5",
     "firebase": "^11.5.0",
     "next": "15.1.7",
