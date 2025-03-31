@@ -13,7 +13,7 @@ export default function Register() {
 	const [address, setAddress] = useState<string>("");
 	const [age, setAge] = useState<number>(0);
 	const router = useRouter();
-	const { refreshUser, loginWithGoogle } = useAuth();
+	const { refreshUser, loginWithProvider } = useAuth();
 
 	const handleRegister = async () => {
 		setError(null);
@@ -35,10 +35,10 @@ export default function Register() {
 		}
 	};
 
-	const handleGoogleSignIn = async () => {
+	const handleProviderSignIn = async (Provider: string) => {
 		setError(null);
 		try {
-			await loginWithGoogle();
+			await loginWithProvider(Provider);
 			await refreshUser;
 			router.replace("/dashboard"); // Redirect after Google sign-in
 		} catch (err: unknown) {
@@ -142,10 +142,16 @@ export default function Register() {
 							Sign Up
 						</button>
 						<button
-							onClick={handleGoogleSignIn}
+							onClick={() => handleProviderSignIn("Google")}
 							className="w-full px-4 py-2 mt-4 text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
 						>
 							Sign Up with Google
+						</button>
+						<button
+							onClick={() => handleProviderSignIn("GitHub")}
+							className="w-full px-4 py-2 mt-4 text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+						>
+							Sign Up with GitHub
 						</button>
 					</div>
 				) : (

@@ -1,229 +1,57 @@
 "use client";
-import React, { OptionHTMLAttributes, useEffect, useState } from 'react';
-import Link from 'next/link';
-import {connectContract, connectWalletViaExtention} from '@/utils/wallet';
-import * as network from '@/utils/network';
 
-export default function Home() 
-{
-    const [wallet, setWallet] = useState<string | null | -1>(null);
-    const [contract, setContract] = useState<string | null | -1 | -2 | -3>(null);
-    const [networkid, setNetworkID] = useState<string | null>(null);
-    const [trending_tokens, setTrendingTokens] = useState<network.TrendingTokenObject[] | null>(null);
-    const [trending_nfts, setTrendingNFTs] = useState<network.TrendingNFTObject[] | null>(null);
 
-    //Handles connecting to wallet inside of util
-    async function handleWalletConnect()
-    {
-        let ret = setWallet(await connectWalletViaExtention());
-        return ret;
-    }
+export default function Home() {
+	return (
+		<div className="min-h-screen bg-gray-900 text-white">
+			<header className="bg-gray-800 py-4">
+				<div className="container mx-auto text-center">
+					<h1 className="text-4xl font-bold">Welcome to CryptoHub</h1>
+					<p className="text-lg mt-2">Your gateway to cryptocurrency insights</p>
+				</div>
+			</header>
 
-    async function handleContractConnect()
-    {
-        const ContractAddress = (document.getElementById("ContractAddress") as HTMLInputElement).value;
-        return setContract(await connectContract(ContractAddress));
-    }
+			<main className="container mx-auto py-8 px-4">
+				<section className="mb-8">
+					<h2 className="text-2xl font-semibold mb-4">Cryptocurrency Stats</h2>
+					<p>Bitcoin: $27,000</p>
+					<p>Ethereum: $1,800</p>
+					<p>Dogecoin: $0.07</p>
+				</section>
 
-    //Anything updated on startup should go here
-    useEffect(() =>
-    {
-        const fetchTokens = async () =>
-        {
-            setTrendingTokens((await network.getTrendingTokens()));
-        }
+				<section className="mb-8">
+					<h2 className="text-2xl font-semibold mb-4">About Cryptocurrency</h2>
+					<p>
+						Cryptocurrency is a digital or virtual currency that uses
+						cryptography for security. It operates independently of a central
+						authority, making it decentralized and secure.
+					</p>
+				</section>
 
-        const fetchNFTs = async () =>
-            {
-                let nfts : network.TrendingNFTObject[] = await network.getTrendingNFTs();
-                setTrendingNFTs(nfts);
-            }
+				<section className="mb-8">
+					<h2 className="text-2xl font-semibold mb-4">Why Crypto?</h2>
+					<p>
+						Cryptocurrencies offer a new way to transact, invest, and store
+						value. They are fast, secure, and borderless, making them a
+						revolutionary financial tool.
+					</p>
+				</section>
 
-        const fetchNetwork = async () =>
-        {
-            setNetworkID(await network.connectNetwork());
-        }
-
-        //Connect to network on startup
-        fetchNetwork();
-
-        //Fetch trending Tokens
-        fetchTokens();
-
-        //fetch trending NFTs
-        fetchNFTs();
-
-    }, [])
-
-    return (
-        <div className="main">
-
-            <div className="networkStatus">
-            {networkid ? 
-            (
-                <p>Network ID: {networkid}</p>
-            ) : 
-            (
-                <p>Not Connected to Network</p>
-            )
-            }
-            </div>
-
-			<br></br>
-
-			<div className="Contract Address">
-				<label>Contract Address:</label>
-				<input
-					type="text"
-					id="ContractAddress"
-					name="ContractAddress"
-					style={{ color: "#000000" }}
-				></input>
-			</div>
-
-			<br></br>
-
-			<div className="connectSmartContractButton">
-				{!contract && (
-					<button
-						onClick={handleContractConnect}
-						className="bg-blue-500 text-white px-4 py-2 rounded"
+				<div className="text-center mt-8">
+					<a
+						href="/auth"
+						className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
 					>
-						Connect Contract
-					</button>
-				)}
+						Go to Auth Page
+					</a>
+				</div>
+			</main>
 
-				{contract === -1 && (
-					<button
-						onClick={handleContractConnect}
-						className="bg-red-500 text-white px-4 py-2 rounded"
-					>
-						No RPC Provider
-					</button>
-				)}
-
-				{contract === -2 && (
-					<button
-						onClick={handleContractConnect}
-						className="bg-red-500 text-white px-4 py-2 rounded"
-					>
-						Failed to fetch ABI
-					</button>
-				)}
-
-				{contract === -3 && (
-					<button
-						onClick={handleContractConnect}
-						className="bg-red-500 text-white px-4 py-2 rounded"
-					>
-						No Contract Address provided
-					</button>
-				)}
-
-				{typeof contract === "string" && (
-					<button
-						onClick={handleContractConnect}
-						className="bg-green-500 text-white px-4 py-2 rounded"
-					>
-						Contract Address: {contract}
-					</button>
-				)}
-			</div>
-
-			<br></br>
-
-            <div className="connectWalletButton">
-                {!wallet && 
-                    <button onClick={handleWalletConnect} className="bg-blue-500 text-white px-4 py-2 rounded">
-                    Connect Wallet Via Web-Extention
-                    </button>
-                }
-
-				{wallet === -1 && (
-					<button
-						onClick={handleWalletConnect}
-						className="bg-red-500 text-white px-4 py-2 rounded"
-					>
-						No RPC Provider
-					</button>
-				)}
-
-				{typeof wallet === "string" && (
-					<button
-						onClick={handleWalletConnect}
-						className="bg-green-500 text-white px-4 py-2 rounded"
-					>
-						Status: Connected
-					</button>
-				)}
-			</div>
-
-			<br></br>
-
-            <div className="trendingList">
-                <p>Trending Coins:</p>
-                {trending_tokens ? 
-                (    
-                    <ul>
-                    {trending_tokens.map((token, index) => 
-                    (
-                    <li key={index}>
-                        <p>
-                            <br></br>
-                            <img src={token.thumb} alt="Example Image" />
-                            {token.name} 
-                            <br></br>
-                            BTC: {token.price_btc}
-                        </p>
-                    </li>
-                    ))}
-                </ul>
-                ) 
-                : 
-                (<p>No Trending Tokens</p>)
-                }
-
-                <br></br>
-
-                <p>Trending NFTs:</p>
-                {trending_nfts ? 
-                (    
-                    <ul>
-                    {trending_nfts.map((nft, index) => 
-                    (
-                    <li key={index}>
-                        <p>
-                            <br></br>
-                            <img src={nft.thumb} alt="Example Image" />
-                            {nft.name} 
-                            <br></br>
-                            Price: {nft.native_currency_symbol} {nft.floor_price_in_native_currency}
-                            <br></br>
-                            Volume: {nft.native_currency_symbol} {nft.data.h24_volume}
-                        </p>
-                    </li>
-                    ))}
-                </ul>
-                ) 
-                : 
-                (<p>No Trending NFTs</p>)
-                }
-            </div>
-
-			<div className="directory">
-				<Link href="/staking" className="text-blue-600 underline mr-4">
-					Staking
-				</Link>
-				<Link href="/security" className="text-red-600 underline mr-4">
-					Security
-				</Link>
-				<Link href="/auth" className="text-green-600 underline mr-4">
-					login
-				</Link>
-				<Link href="/auth" className="text-yellow-600 underline">
-					register
-				</Link>
-			</div>
+			<footer className="bg-gray-800 py-4 mt-8">
+				<div className="container mx-auto text-center">
+					<p>&copy; 2023 CryptoHub. All rights reserved.</p>
+				</div>
+			</footer>
 		</div>
 	);
 }

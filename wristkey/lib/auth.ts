@@ -7,6 +7,7 @@ import {
 	updateProfile,
 	signInWithPopup,
 	GoogleAuthProvider,
+	GithubAuthProvider,
 } from "firebase/auth";
 import { saveUserToFirestore } from "./firestore";
 
@@ -48,8 +49,18 @@ export const logout = async (): Promise<void> => {
 	await signOut(auth);
 };
 
-export const signInWithGoogle = async (): Promise<AuthUser> => {
-	const provider = new GoogleAuthProvider();
+export const signInWithProvider = async (providerType: string): Promise<AuthUser> => {
+	let provider;
+	switch (providerType) {
+		case "Google":
+			provider = new GoogleAuthProvider();
+			break;
+		case "GitHub":
+			provider = new GithubAuthProvider();
+			break;
+		default:
+			throw new Error("Unsupported provider");
+	}
 	try {
 		const result = await signInWithPopup(auth, provider);
 		const user = result.user;

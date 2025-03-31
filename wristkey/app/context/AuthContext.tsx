@@ -10,7 +10,7 @@ import { auth, db } from "@/firebaseConfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { saveIncompleteUserToFirestore } from "@/lib/firestore";
 import { doc, getDoc } from "firebase/firestore";
-import { signInWithGoogle } from "@/lib/auth";
+import { signInWithProvider } from "@/lib/auth";
 
 // Define Firestore User Type
 interface FirestoreUser {
@@ -26,7 +26,7 @@ interface FirestoreUser {
 interface AuthContextType {
 	user: FirestoreUser | null;
 	loading: boolean;
-	loginWithGoogle: () => Promise<void>;
+	loginWithProvider: (Provider: string) => Promise<void>;
 	logout: () => Promise<void>;
 	refreshUser: () => Promise<void>;
 }
@@ -53,10 +53,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	};
 
 	// ✅ Google Login
-	const loginWithGoogle = async () => {
+	const loginWithProvider = async (Provider: string) => {
 		try {
-			const firebaseUser = await signInWithGoogle();
-
+			const firebaseUser = await signInWithProvider(Provider);
 			// Check if user exists in Firestore
 			const firestoreUser = await fetchUserData(firebaseUser.uid);
 
@@ -105,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	return (
 		<AuthContext.Provider
-			value={{ user, loading, loginWithGoogle, logout, refreshUser }}
+			value={{ user, loading, loginWithProvider, logout, refreshUser }}
 		>
 			{children}
 		</AuthContext.Provider>

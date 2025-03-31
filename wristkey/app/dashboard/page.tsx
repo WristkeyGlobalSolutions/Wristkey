@@ -32,6 +32,12 @@ export default function Dashboard() {
 					<p className="text-gray-600"><strong>Profile Complete:</strong> {user.isProfileComplete ? "Yes" : "No"}</p>
 				</div>
 				<button
+					onClick={() => router.push("/dashboard/coins")}
+					className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded transition duration-200 mb-4"
+				>
+					Go to Coins
+				</button>
+				<button
 					onClick={logout}
 					className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition duration-200"
 				>
