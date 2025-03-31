@@ -4,18 +4,20 @@ import Link from "next/link";
 import { connectContract, connectWalletViaExtention } from "@/utils/wallet";
 import * as network from "@/utils/network";
 import CoinCard from "@/components/coinCard";
+import { Console } from "console";
 
 export default function Coins() {
 	const [wallet, setWallet] = useState<string | null | -1>(null);
-	const [contract, setContract] = useState<string | null | -1 | -2 | -3>(
-		null
-	);
+
 	const [networkid, setNetworkID] = useState<string | null>(null);
 	const [trending_tokens, setTrendingTokens] = useState<
-		network.TrendingTokenObject[] | null
+		network.TokenObject[] | null
 	>(null);
 	const [trending_nfts, setTrendingNFTs] = useState<
-		network.TrendingNFTObject[] | null
+		network.NFTObject[] | null
+	>(null);
+	const [search, setSearch] = useState<
+        network.GeckoSearchQuery | null
 	>(null);
 
 	//Handles connecting to wallet inside of util
@@ -23,13 +25,28 @@ export default function Coins() {
 		const ret = setWallet(await connectWalletViaExtention());
 		return ret;
 	}
+    
+    async function handleSearch(event : React.KeyboardEvent<HTMLInputElement>)
+    {
+        if(event.code == "Enter" && event.currentTarget.id == "TokenNFTSearchBar")
+        {
+            let input = (document.getElementById("TokenNFTSearchBar") as HTMLInputElement).value;
+            let output : network.GeckoSearchQuery | null = await network.searchGecko(input);
 
-	async function handleContractConnect() {
-		const ContractAddress = (
-			document.getElementById("ContractAddress") as HTMLInputElement
-		).value;
-		return setContract(await connectContract(ContractAddress));
-	}
+            if(output)
+            {
+                setSearch(output);
+            }
+            else
+            {
+                setSearch(null);
+            }
+        }
+        else
+        {
+            setSearch(null);
+        }
+    }
 
 	//Anything updated on startup should go here
 	useEffect(() => {
@@ -38,7 +55,7 @@ export default function Coins() {
 		};
 
 		const fetchNFTs = async () => {
-			const nfts: network.TrendingNFTObject[] =
+			const nfts: network.NFTObject[] =
 				await network.getTrendingNFTs();
 			setTrendingNFTs(nfts);
 		};
@@ -72,63 +89,55 @@ export default function Coins() {
 					)}
 				</div>
 
-				<div className="contract-address space-y-2">
+				<div className="search-bar space-y-2">
 					<label className="block text-sm font-medium text-gray-700">
-						Contract Address:
+						Search:
 					</label>
 					<input
 						type="text"
-						id="ContractAddress"
-						name="ContractAddress"
+						id="TokenNFTSearchBar"
+						name="TokenNFTSearchBar"
 						className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-					/>
-				</div>
+                        placeholder="Search Tokens and NFTs..."
+                        style={{color: "black"}}
+                        onKeyDown={(event) => handleSearch(event)}
+                    />
 
-				<div className="connectSmartContractButton text-center">
-					{!contract && (
-						<button
-							onClick={handleContractConnect}
-							className="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
-						>
-							Connect Contract
-						</button>
-					)}
+                    <div className="searchResult space-y-6">
+                        <div></div>
 
-					{contract === -1 && (
-						<button
-							onClick={handleContractConnect}
-							className="bg-red-500 text-white px-6 py-2 rounded-md shadow hover:bg-red-600"
-						>
-							No RPC Provider
-						</button>
-					)}
-
-					{contract === -2 && (
-						<button
-							onClick={handleContractConnect}
-							className="bg-red-500 text-white px-6 py-2 rounded-md shadow hover:bg-red-600"
-						>
-							Failed to fetch ABI
-						</button>
-					)}
-
-					{contract === -3 && (
-						<button
-							onClick={handleContractConnect}
-							className="bg-red-500 text-white px-6 py-2 rounded-md shadow hover:bg-red-600"
-						>
-							No Contract Address provided
-						</button>
-					)}
-
-					{typeof contract === "string" && (
-						<button
-							onClick={handleContractConnect}
-							className="bg-green-500 text-white px-6 py-2 rounded-md shadow hover:bg-green-600"
-						>
-							Contract Address: {contract}
-						</button>
-					)}
+                        {search ? (
+                            <div>
+                            <p className="text-lg font-semibold">Tokens: ({search.tokens.length})</p>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {search.tokens.map((token, index) => (
+                                    <li key={index}>
+                                    <CoinCard
+                                        name={token.name}
+                                        thumb={token.thumb}
+                                        price_btc={""}
+                                    />
+                                </li>
+                                ))}
+                            </ul>
+                            <p className="text-lg font-semibold">NFTs: ({search.nfts.length})</p>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {search.nfts.map((nft, index) => (
+                                <li key={index}>
+                                    <CoinCard
+                                        name={nft.name}
+                                        thumb={nft.thumb}
+                                        price_btc={""}
+                                        volume={""}
+                                    />
+                                </li>
+                                ))}
+                            </ul>
+                            </div>
+                        ) : (
+                            <p></p>
+                        )}
+                    </div>
 				</div>
 
 				<div className="connectWalletButton text-center">

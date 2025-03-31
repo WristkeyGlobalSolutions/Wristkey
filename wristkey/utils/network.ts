@@ -18,8 +18,14 @@ const COINGECKO_URL = "https://api.coingecko.com/api/v3/";
 export let provider : ethers.JsonRpcProvider;
 export let network : Promise<ethers.Network>;
 
+export type GeckoSearchQuery =
+{
+    nfts: NFTObject[];
+    tokens: TokenObject[];
+}
+
 //Documentation: https://docs.coingecko.com/reference/trending-search
-export type TrendingTokenObject = 
+export type TokenObject = 
 {
     id: string;
     name: string;
@@ -33,7 +39,7 @@ export type TrendingTokenObject =
     data : any; //Additional data, check API Docs
 }
 
-export type TrendingNFTObject = 
+export type NFTObject = 
 {
     id: string;
     name: string;
@@ -58,7 +64,7 @@ export async function connectNetwork()
 }
 
 //Gets a list of the top 10 trending Tokens
-export async function getTrendingTokens(): Promise<TrendingTokenObject[]> 
+export async function getTrendingTokens(): Promise<TokenObject[]> 
 {
     try 
     {
@@ -77,7 +83,6 @@ export async function getTrendingTokens(): Promise<TrendingTokenObject[]>
             data: coin.item.data
         }));
   
-        console.log(trending);
         return trending;
     } 
     catch(error)
@@ -88,12 +93,12 @@ export async function getTrendingTokens(): Promise<TrendingTokenObject[]>
 }
 
 //Gets a list of the top 7 trending NFTs
-export async function getTrendingNFTs(): Promise<TrendingNFTObject[]> 
+export async function getTrendingNFTs(): Promise<NFTObject[]> 
 {
     try 
     {
         const response = await axios.get(COINGECKO_URL + 'search/trending');
-        const trending = response.data.nfts.map((nft: TrendingNFTObject) => 
+        const trending = response.data.nfts.map((nft: NFTObject) => 
         ({
             id: nft.id,
             name: nft.name,
@@ -112,5 +117,32 @@ export async function getTrendingNFTs(): Promise<TrendingNFTObject[]>
     {
         console.error("Error fetching trending NFTs:", error);
         return [];
+    }
+}
+
+//Default only searches for NFTs and Coins
+export async function searchGecko(input : string, limiters : string[] = ["exchanges", "ios"]) : Promise<GeckoSearchQuery | null>
+{
+    try 
+    {
+        const response = await axios.get(COINGECKO_URL + 'search/?query=' + input);
+
+        let ret : GeckoSearchQuery =
+        {
+            tokens: response.data.coins,
+            nfts: response.data.nfts
+        }
+
+        if(ret.tokens.length == 0 && ret.nfts.length == 0)
+        {
+            return null;
+        }
+
+        return ret;
+    }
+    catch(error)
+    {
+        console.error("Error searching Gecko:", error);
+        return null;    
     }
 }

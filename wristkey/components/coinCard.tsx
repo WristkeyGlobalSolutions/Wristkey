@@ -14,7 +14,7 @@ const CoinCard: React.FC<CoinCardProps> = ({
 	volume,
 }) => {
 	return (
-		<li className="p-4 border rounded-md shadow hover:shadow-lg">
+		<div className="p-4 border rounded-md shadow hover:shadow-lg">
 			<img
 				src={thumb}
 				alt={`${name} Image`}
@@ -27,7 +27,7 @@ const CoinCard: React.FC<CoinCardProps> = ({
 			{volume && (
 				<p className="text-center text-gray-600">Volume: {volume}</p>
 			)}
-		</li>
+		</div>
 	);
 };
 
