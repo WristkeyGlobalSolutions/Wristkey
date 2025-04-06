@@ -1,5 +1,5 @@
 import { ethers, Wallet } from 'ethers';
-import { provider, network, ETHSCAN_KEY, ETHERSCAN_URL} from '@/utils/network';
+import { provider, network, ETHERSCAN_URL} from '@/utils/network';
 
 //const POLYGON_RPC = 'https://rpc-mumbai.maticvigil.com';
 
@@ -35,7 +35,7 @@ export const getContract = async () =>
 //Would we even need this? Is the ABI provided by default?
 async function getABI(contractAddress : string | ethers.Addressable)
 {
-    const url = ETHERSCAN_URL + `?module=contract&action=getabi&address=${contractAddress}&apikey=${ETHSCAN_KEY}`;
+    const url = ETHERSCAN_URL + `?module=contract&action=getabi&address=${contractAddress}&apikey=${process.env.ETHSCAN_KEY}`;
     let ABI : ethers.InterfaceAbi = [];
 
     try
@@ -110,6 +110,7 @@ export async function connectWalletViaExtention()
         {
             const accounts = await window.ethereum.request({method: "eth_requestAccounts"});
             addWallet(accounts[0]);
+            console.log(accounts[0]);
 
             return accounts[0];
         } 

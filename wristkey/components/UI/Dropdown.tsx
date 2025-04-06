@@ -47,7 +47,7 @@ const Dropdown: React.FC = () => {
             <li>
               <a 
                 href="/dashboard/portfolio"
-           			onClick={() => router.push('../dashboard/portfolio')} 
+           			onClick={() => router.push('/dashboard/portfolio')} 
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
               >
                 Portfolio
@@ -56,7 +56,7 @@ const Dropdown: React.FC = () => {
             <li>
               <a 
                 href="/dashboard/coins"
-           			onClick={() => router.push('../dashboard/coins')} 
+           			onClick={() => router.push('/dashboard/coins')} 
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
               >
                 Explore
