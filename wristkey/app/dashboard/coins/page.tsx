@@ -14,10 +14,10 @@ export default function Coins() {
 
 	const [networkid, setNetworkID] = useState<string | null>(null);
 	const [trending_tokens, setTrendingTokens] = useState<
-		network.TokenObject[] | null
+		network.PreviewTokenObject[] | null
 	>(null);
 	const [trending_nfts, setTrendingNFTs] = useState<
-		network.NFTObject[] | null
+		network.PreviewNFTObject[] | null
 	>(null);
 	const [search, setSearch] = useState<network.GeckoSearchQuery | null>(null);
 
@@ -55,8 +55,7 @@ export default function Coins() {
 		};
 
 		const fetchNFTs = async () => {
-			const nfts: network.NFTObject[] = await network.getTrendingNFTs();
-			setTrendingNFTs(nfts);
+			setTrendingNFTs(await network.getTrendingNFTs());
 		};
 
 		const fetchNetwork = async () => {
@@ -119,42 +118,41 @@ export default function Coins() {
 					<div className="searchResult space-y-6">
 						<div></div>
 
-						{search ? (
-							<div>
-								<p className="text-lg font-semibold">
-									Tokens: ({search.tokens.length})
-								</p>
-								<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-									{search.tokens.map((token, index) => (
-										<li key={index}>
-											<CoinCard
-												name={token.name}
-												thumb={token.thumb}
-												price_btc={""}
-											/>
-										</li>
-									))}
-								</ul>
-								<p className="text-lg font-semibold">
-									NFTs: ({search.nfts.length})
-								</p>
-								<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-									{search.nfts.map((nft, index) => (
-										<li key={index}>
-											<CoinCard
-												name={nft.name}
-												thumb={nft.thumb}
-												price_btc={""}
-												volume={""}
-											/>
-										</li>
-									))}
-								</ul>
-							</div>
-						) : (
-							<p></p>
-						)}
-					</div>
+                        {search ? (
+                            <div>
+                            <p className="text-lg font-semibold">Tokens: ({search.tokens.length})</p>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {search.tokens.map((token, index) => (
+                                    <li key={index}>
+                                    <CoinCard
+                                        name={token.name}
+                                        thumb={token.image_thumb}
+                                        price={""}
+                                        id ={token.id}
+                                        identifier={"token"}
+                                    />
+                                </li>
+                                ))}
+                            </ul>
+                            <p className="text-lg font-semibold">NFTs: ({search.nfts.length})</p>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {search.nfts.map((nft, index) => (
+                                <li key={index}>
+                                    <CoinCard
+                                        name={nft.name}
+                                        thumb={nft.image_thumb}
+                                        price={""}
+                                        id={nft.id}
+                                        identifier={"nft"}
+                                    />
+                                </li>
+                                ))}
+                            </ul>
+                            </div>
+                        ) : (
+                            <p></p>
+                        )}
+                    </div>
 				</div>
 
 				<div className="connectWalletButton text-center">
@@ -195,8 +193,10 @@ export default function Coins() {
 								<li key={index}>
 									<CoinCard
 										name={token.name}
-										thumb={token.thumb}
-										price_btc={token.price_btc + " BTC"}
+										thumb={token.image_thumb}
+										price={token.price_btc + " BTC"}
+                                        identifier={"token"}
+                                        id={token.id}
 									/>
 								</li>
 							))}
@@ -214,10 +214,12 @@ export default function Coins() {
 								<li key={index}>
 									<CoinCard
 										name={nft.name}
-										thumb={nft.thumb}
-										price_btc={`${nft.native_currency_symbol} ${nft.floor_price_in_native_currency}`}
-										volume={`${nft.native_currency_symbol} ${nft.data.h24_volume}`}
-									/>
+										thumb={nft.image_thumb}
+										price={`${nft.native_currency_symbol} ${nft.floor_price_in_native_currency}`}
+										volume={`${nft.h24_volume}`}
+                                        id={nft.id}
+                                        identifier={"nft"}
+                                    />
 								</li>
 							))}
 						</ul>
