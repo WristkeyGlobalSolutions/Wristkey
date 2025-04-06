@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signUp, signIn } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Register() {
+	const { user, loading } = useAuth();
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [error, setError] = useState<string | null>(null);
@@ -25,7 +26,7 @@ export default function Register() {
 		try {
 			await signUp(email, password, name, address, age);
 			router.replace("/dashboard"); // Redirect after registration
-            alert("Registration successful! You can now log in.");
+			alert("Registration successful! You can now log in.");
 		} catch (err: unknown) {
 			if (err instanceof Error) {
 				setError(err.message);
@@ -50,7 +51,9 @@ export default function Register() {
 		}
 	};
 
-	const [activeTab, setActiveTab] = useState<"register" | "login">("register");
+	const [activeTab, setActiveTab] = useState<"register" | "login">(
+		"register"
+	);
 
 	const handleLogin = async () => {
 		setError(null);
@@ -71,6 +74,21 @@ export default function Register() {
 			}
 		}
 	};
+
+	
+		useEffect(() => {
+			if (!loading) {
+				if ( user && !user.isProfileComplete) {
+					router.push("/complete-profile"); // ✅ Redirect if profile is incomplete
+				} else if (user) {
+					router.push("/dashboard"); // ✅ Redirect if user is not logged in
+				}
+			}
+		}, [user, loading, router]);
+	
+		if (loading) return <p>Loading...</p>;
+		if (user) return null;
+
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">

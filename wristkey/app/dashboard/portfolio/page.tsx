@@ -5,9 +5,13 @@ import { connectContract, connectWalletViaExtention } from "@/utils/wallet";
 import * as network from "@/utils/network";
 import CoinCard from "@/components/coinCard";
 import WalletNav from "@/components/UI/WalletNav";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from 'next/navigation';
 
 const Portfolio = () => {
-
+	const { user, loading } = useAuth();
+	const router = useRouter();
+	
   const [activeTab, setActiveTab] = useState<'mywallet' | 'nfts'>('mywallet')
   const [networkid, setNetworkID] = useState<string | null>(null);
 	const [trending_tokens, setTrendingTokens] = useState<
@@ -45,6 +49,19 @@ const Portfolio = () => {
 		//fetch trending NFTs
 		fetchNFTs();
 	}, []);
+
+	useEffect(() => {
+		if (!loading) {
+			if (!user) {
+				router.push("/auth");
+			} else if (!user.isProfileComplete) {
+				router.push("/complete-profile"); // ✅ Redirect if profile is incomplete
+			}
+		}
+	}, [user, loading, router]);
+
+	if (loading) return <p>Loading...</p>;
+	if (!user) return null;
 
   return (
     <div>

@@ -1,5 +1,5 @@
 "use client";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { db } from "@/firebaseConfig";
 import { doc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
