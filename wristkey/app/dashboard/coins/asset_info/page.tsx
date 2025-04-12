@@ -1,11 +1,12 @@
 "use client";
-import { DetailedTokenObject, DetailedNFTObject, getToken, getNFT } from "@/utils/network";
+import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import * as API from "../api";
 
 export default function AssetInfo() 
 {
-    const [asset, setAsset] = useState<DetailedTokenObject | DetailedNFTObject | null>(null);
+    const [asset, setAsset] = useState<API.DetailedTokenObject | API.DetailedNFTObject | null>(null);
     const[assetDescription, setAssetDescription] = useState<string | null>(null);
 
     const type = useSearchParams().get('type');
@@ -19,13 +20,13 @@ export default function AssetInfo()
                 let asset : any;
                 if(type == "nft")
                 {
-                    asset = await getNFT(id);
+                    asset = await API.getNFT(id);
                     setAsset(asset);
                 }
         
                 else if(type == "token")
                 {
-                    asset = await getToken(id);
+                    asset = await API.getToken(id);
                     setAsset(asset);
                 }
 
@@ -65,7 +66,7 @@ export default function AssetInfo()
                         <br></br>
 
                         <img
-                            src={asset.image_small}
+                            src={asset.image_small as "image"}
                             alt={`${name} Image`}
                             width={50}
                             height={50}

@@ -1,5 +1,5 @@
 "use client";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -23,30 +23,13 @@ export default function Dashboard() {
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
 			<div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
-				<h2 className="text-2xl font-bold text-gray-800 mb-4">
-					Dashboard
-				</h2>
-				<p className="text-gray-600 mb-4">
-					Welcome,{" "}
-					<span className="font-medium text-gray-800">
-						{user.name}
-					</span>
-					!
-				</p>
+				<h2 className="text-2xl font-bold text-gray-800 mb-4">Dashboard</h2>
+				<p className="text-gray-600 mb-4">Welcome, <span className="font-medium text-gray-800">{user.name}</span>!</p>
 				<div className="mb-4">
-					<p className="text-gray-600">
-						<strong>Email:</strong> {user.email}
-					</p>
-					<p className="text-gray-600">
-						<strong>Age:</strong> {user.age}
-					</p>
-					<p className="text-gray-600">
-						<strong>Address:</strong> {user.address}
-					</p>
-					<p className="text-gray-600">
-						<strong>Profile Complete:</strong>{" "}
-						{user.isProfileComplete ? "Yes" : "No"}
-					</p>
+					<p className="text-gray-600"><strong>Email:</strong> {user.email}</p>
+					<p className="text-gray-600"><strong>Age:</strong> {user.age}</p>
+					<p className="text-gray-600"><strong>Address:</strong> {user.address}</p>
+					<p className="text-gray-600"><strong>Profile Complete:</strong> {user.isProfileComplete ? "Yes" : "No"}</p>
 				</div>
 				<button
 					onClick={() => router.push("/dashboard/coins")}

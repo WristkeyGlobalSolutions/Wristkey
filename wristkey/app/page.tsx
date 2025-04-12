@@ -7,7 +7,7 @@ export default function Home() {
 		<div className="min-h-screen rounded-xl  text-white">
 			<header className="py-40">
 				<div className="container mx-auto text-center font-bold">
-					<h1 className="text-6xl">HipHop Crypto Wallet</h1>
+					<h1 className="text-6xl">Wristkey Global Wallet</h1>
 					<p className="text-4xl mt-2">Your gateway to cryptocurrency</p>
 				</div>
 			</header>

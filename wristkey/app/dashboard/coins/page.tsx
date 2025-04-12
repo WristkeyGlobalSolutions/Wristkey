@@ -1,61 +1,54 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { connectWalletViaExtention } from "@/utils/wallet";
 import * as network from "@/utils/network";
+import * as API from "./api";
 import CoinCard from "@/components/coinCard";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { Console } from "console";
+import axios from "axios";
 
 export default function Coins() {
-	const [wallet, setWallet] = useState<string | null | -1>(null);
-	const { user, loading } = useAuth();
-	const router = useRouter();
-
 	const [networkid, setNetworkID] = useState<string | null>(null);
 	const [trending_tokens, setTrendingTokens] = useState<
-		network.PreviewTokenObject[] | null
-	>(null);
+    API.PreviewTokenObject[] | null
+    >(null);
 	const [trending_nfts, setTrendingNFTs] = useState<
-		network.PreviewNFTObject[] | null
+    API.PreviewNFTObject[] | null
 	>(null);
-	const [search, setSearch] = useState<network.GeckoSearchQuery | null>(null);
+	const [search, setSearch] = useState<
+    API.GeckoSearchQuery | null
+	>(null);
+    
+    async function handleSearch(event : React.KeyboardEvent<HTMLInputElement>)
+    {
+        if(event.code == "Enter" && event.currentTarget.id == "TokenNFTSearchBar")
+        {
+            let input = (document.getElementById("TokenNFTSearchBar") as HTMLInputElement).value;
+            let output : API.GeckoSearchQuery | null = await API.searchGecko(input);
 
-	//Handles connecting to wallet inside of util
-	async function handleWalletConnect() {
-		const ret = setWallet(await connectWalletViaExtention());
-		return ret;
-	}
-
-	async function handleSearch(event: React.KeyboardEvent<HTMLInputElement>) {
-		if (
-			event.code == "Enter" &&
-			event.currentTarget.id == "TokenNFTSearchBar"
-		) {
-			const input = (
-				document.getElementById("TokenNFTSearchBar") as HTMLInputElement
-			).value;
-			const output: network.GeckoSearchQuery | null =
-				await network.searchGecko(input);
-
-			if (output) {
-				setSearch(output);
-			} else {
-				setSearch(null);
-			}
-		} else {
-			setSearch(null);
-		}
-	}
+            if(output)
+            {
+                setSearch(output);
+            }
+            else
+            {
+                setSearch(null);
+            }
+        }
+        else
+        {
+            setSearch(null);
+        }
+    }
 
 	//Anything updated on startup should go here
 	useEffect(() => {
 		const fetchTokens = async () => {
-			setTrendingTokens(await network.getTrendingTokens());
+			setTrendingTokens(await API.getTrendingTokens());
 		};
 
 		const fetchNFTs = async () => {
-			setTrendingNFTs(await network.getTrendingNFTs());
+			setTrendingNFTs(await API.getTrendingNFTs());
 		};
 
 		const fetchNetwork = async () => {
@@ -71,20 +64,6 @@ export default function Coins() {
 		//fetch trending NFTs
 		fetchNFTs();
 	}, []);
-
-
-	useEffect(() => {
-		if (!loading) {
-			if (!user) {
-				router.push("/auth");
-			} else if (!user.isProfileComplete) {
-				router.push("/complete-profile"); // ✅ Redirect if profile is incomplete
-			}
-		}
-	}, [user, loading, router]);
-
-	if (loading) return <p>Loading...</p>;
-	if (!user) return null;
 
 	return (
 		<>
@@ -110,13 +89,13 @@ export default function Coins() {
 						id="TokenNFTSearchBar"
 						name="TokenNFTSearchBar"
 						className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-						placeholder="Search Tokens and NFTs..."
-						style={{ color: "black" }}
-						onKeyDown={(event) => handleSearch(event)}
-					/>
+                        placeholder="Search Tokens and NFTs..."
+                        style={{color: "black"}}
+                        onKeyDown={(event) => handleSearch(event)}
+                    />
 
-					<div className="searchResult space-y-6">
-						<div></div>
+                    <div className="searchResult space-y-6">
+                        <div></div>
 
                         {search ? (
                             <div>
@@ -153,35 +132,6 @@ export default function Coins() {
                             <p></p>
                         )}
                     </div>
-				</div>
-
-				<div className="connectWalletButton text-center">
-					{!wallet && (
-						<button
-							onClick={handleWalletConnect}
-							className="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
-						>
-							Connect Wallet Via Web-Extension
-						</button>
-					)}
-
-					{wallet === -1 && (
-						<button
-							onClick={handleWalletConnect}
-							className="bg-red-500 text-white px-6 py-2 rounded-md shadow hover:bg-red-600"
-						>
-							No RPC Provider
-						</button>
-					)}
-
-					{typeof wallet === "string" && (
-						<button
-							onClick={handleWalletConnect}
-							className="bg-green-500 text-white px-6 py-2 rounded-md shadow hover:bg-green-600"
-						>
-							Status: Connected
-						</button>
-					)}
 				</div>
 
 				<div className="trendingList space-y-6">

@@ -29,7 +29,7 @@ const router = useRouter();
         onClick={() => router.push(`/dashboard/coins/asset_info?type=${identifier}&id=${id}`)}
         >
 			<img
-				src={thumb}
+				src={thumb as "image"}
 				alt={`${name} Image`}
 				width={50}
 				height={50}

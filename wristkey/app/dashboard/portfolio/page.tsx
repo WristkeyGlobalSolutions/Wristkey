@@ -1,75 +1,43 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { connectContract, connectWalletViaExtention } from "@/utils/wallet";
-import * as network from "@/utils/network";
-import CoinCard from "@/components/coinCard";
+import { getContract, connectWalletViaExtention } from "./api";
 import WalletNav from "@/components/UI/WalletNav";
-import { useAuth } from "@/context/AuthContext";
 import { useRouter } from 'next/navigation';
 
 const Portfolio = () => {
-	const { user, loading } = useAuth();
-	const router = useRouter();
-	
+
   const [activeTab, setActiveTab] = useState<'mywallet' | 'nfts'>('mywallet')
-  const [networkid, setNetworkID] = useState<string | null>(null);
-	const [trending_tokens, setTrendingTokens] = useState<
-		network.TokenObject[] | null
-	>(null);
-	const [trending_nfts, setTrendingNFTs] = useState<
-		network.NFTObject[] | null
-	>(null);
 
   const handleClick = (page: 'mywallet' | 'nfts') => {
     setActiveTab(page);
+
   };
 
   useEffect(() => {
-		const fetchTokens = async () => {
-			setTrendingTokens(await network.getTrendingTokens());
-		};
 
-		const fetchNFTs = async () => {
-			const nfts: network.NFTObject[] =
-				await network.getTrendingNFTs();
-			setTrendingNFTs(nfts);
-		};
-
-		const fetchNetwork = async () => {
-			setNetworkID(await network.connectNetwork());
-		};
-
-		//Connect to network on startup
-		fetchNetwork();
-
-		//Fetch trending Tokens
-		fetchTokens();
-
-		//fetch trending NFTs
-		fetchNFTs();
 	}, []);
 
-	useEffect(() => {
-		if (!loading) {
-			if (!user) {
-				router.push("/auth");
-			} else if (!user.isProfileComplete) {
-				router.push("/complete-profile"); // ✅ Redirect if profile is incomplete
-			}
-		}
-	}, [user, loading, router]);
-
-	if (loading) return <p>Loading...</p>;
-	if (!user) return null;
+    const router = useRouter();
 
   return (
+
     <div>
       {/* Header */}
       <div className="transparent p-8">
         <h1 className="text-gray-500 text-center font-bold text-7xl">$210,101</h1>
         <h1 className="text-center text-3xl text-green-500">+2.5%</h1>
       </div>
+
+        <div className="connectWalletButton text-center">
+            {
+                <button
+                    onClick={() => router.push(`/dashboard/portfolio/wallet_connect`)}
+                    className="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
+                >
+                    Connect Wallet
+                </button>
+            }
+        </div>
 
       {/* White section content with a table below the buttons */}
       <div className="transparent flex min-h-screen p-2">

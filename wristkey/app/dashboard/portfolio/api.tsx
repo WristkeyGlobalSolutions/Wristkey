@@ -1,10 +1,21 @@
 import { ethers, Wallet } from 'ethers';
 import { provider, network, ETHERSCAN_URL} from '@/utils/network';
+import axios from 'axios';
 
 //const POLYGON_RPC = 'https://rpc-mumbai.maticvigil.com';
 
-let smart_contracts : ethers.Contract[] = [];
 let wallet_addresses : string[] = [];
+
+export type WalletTokenObject =
+{
+    name : string;
+    balance : string;
+    decimals : string;
+    image_logo : string;
+    symbol : string;
+    image_thumbnail : string;
+    token_address : string;
+}
 
 //const CONTRACT_ADDRESS = 'your_contract_address';
 //const ABI: ethers.Interface | ethers.InterfaceAbi = [/* contract ABI */];
@@ -35,7 +46,7 @@ export const getContract = async () =>
 //Would we even need this? Is the ABI provided by default?
 async function getABI(contractAddress : string | ethers.Addressable)
 {
-    const url = ETHERSCAN_URL + `?module=contract&action=getabi&address=${contractAddress}&apikey=${process.env.ETHSCAN_KEY}`;
+    const url = ETHERSCAN_URL + `?module=contract&action=getabi&address=${contractAddress}&apikey=${process.env.NEXT_PUBLIC_ETHSCAN_KEY}`;
     let ABI : ethers.InterfaceAbi = [];
 
     try
@@ -60,46 +71,6 @@ async function getABI(contractAddress : string | ethers.Addressable)
     return ABI;
 }
 
-//Adds the contract to a local variable
-function addContract(contract : ethers.Contract)
-{
-    //TODO: Grab Contracts from cloud
-    if(smart_contracts.length == 0)
-    {
-        smart_contracts.push(contract);
-    }
-
-    smart_contracts.forEach(stored_contract => {
-        if(stored_contract.getAddress() == contract.getAddress())
-        {
-            return;
-        }
-    });  
-    
-    smart_contracts.push(contract);
-    //TODO: Upload new contracts to cloud
-}
-
-//Removes the contract from a local variable
-function removeContract(contract_or_address : ethers.Contract | Promise<string>)
-{
-    //TODO: Grab Contracts from cloud
-    if(smart_contracts.length == 0)
-    {
-        return;
-    }
-    
-    if(contract_or_address instanceof ethers.Contract)
-    {
-        smart_contracts = smart_contracts.filter(stored_contract => stored_contract.getAddress() == contract_or_address.getAddress());
-    }
-    else
-    {
-        smart_contracts = smart_contracts.filter(stored_contract => stored_contract.getAddress() == contract_or_address);
-    }
-
-    //TODO: Upload new contracts to cloud
-}
 
 //Connects a wallet via Metamask / etherium extention
 export async function connectWalletViaExtention()
@@ -110,8 +81,6 @@ export async function connectWalletViaExtention()
         {
             const accounts = await window.ethereum.request({method: "eth_requestAccounts"});
             addWallet(accounts[0]);
-            console.log(accounts[0]);
-
             return accounts[0];
         } 
         catch(error) 
@@ -125,7 +94,34 @@ export async function connectWalletViaExtention()
         }
 }
 
-export const getWallets = async () =>
+//This seems to be super unsafe
+export async function connectWalletViaPhrase(phrase : string)
+{
+    try
+    {
+        const wallet = Wallet.fromPhrase(phrase);
+        addWallet(wallet.address);       
+    }
+    catch(error)
+    {
+        return -1;
+    }
+}
+
+export async function connectWalletViaAddress(address : string)
+{
+    let tokens : WalletTokenObject[] = await getTokens(address);
+
+    tokens.forEach(token =>
+    {
+        console.log(token.name + " " + ethers.formatUnits(token.balance, token.decimals));
+        console.log(token);
+    });
+
+    addWallet(address);
+}
+
+export async function getWallets()
 {
     return wallet_addresses;
 }
@@ -143,8 +139,7 @@ function removeWallet(wallet_address : string)
     wallet_addresses.filter(address => address == wallet_address);
 }
 
-
-export const createWallet = async () =>
+export async function createWallet()
 {
     if(provider)
     {
@@ -159,13 +154,14 @@ export const createWallet = async () =>
     }
 }
 
-export const createWalletFromPrivateKey = async (privateKey : string) =>
+export async function createWalletFromPrivateKey(privateKey : string)
 {
     if(provider)
     {
         const new_wallet = new Wallet(privateKey, provider);
         new_wallet.connect(provider);
-        return new_wallet;
+        addWallet(await new_wallet.getAddress());
+        return await new_wallet.getAddress();
     }
     else
     {
@@ -173,7 +169,7 @@ export const createWalletFromPrivateKey = async (privateKey : string) =>
     }
 }
 
-export const connectContract = async (contractAddress : string | ethers.Addressable, ABI? : ethers.InterfaceAbi | Promise<any>) => 
+export async function getContract(contractAddress : string | ethers.Addressable, ABI? : ethers.InterfaceAbi | Promise<any>)
 {
     if(!contractAddress)
     {
@@ -196,25 +192,37 @@ export const connectContract = async (contractAddress : string | ethers.Addressa
     if(provider)
     {
         const contract = new ethers.Contract(contractAddress, await ABI, provider);
-        addContract(contract);
-        
-        return await contract.getAddress();
+        return contract;
     }
     else
     {
         return -1;
     }
 }
-  
-export const getBalance = async (address : ethers.AddressLike) =>
+
+//I'm not 100% sure what this returns yet. Still working out the kinks
+export async function getTokens(address : ethers.AddressLike) : Promise<WalletTokenObject[]>
 {
-    if(provider)
-    {
-        return (await provider.getBalance(address));
-    }
-    else
-    {
-        return "No RPC Provider";
-    }
+    const response = await fetch(`https://deep-index.moralis.io/api/v2.2/${address}/erc20?chain=eth`, {
+        headers: {
+          'X-API-Key': process.env.NEXT_PUBLIC_MORALIS_KEY as string
+        }
+      });
+    
+    const tokens = await response.json();
+
+    const ret_tokens = tokens.map((coin: any) => 
+    ({
+        name: coin.name,
+        balance: coin.balance,
+        decimals: coin.decimals,
+        image_logo: coin.logo,
+        symbol: coin.symbol,
+        image_thumbnail: coin.thumbnail,
+        token_address: coin.token_address
+    })        
+    );
+
+    return ret_tokens;
 }
   
