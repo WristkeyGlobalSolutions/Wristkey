@@ -13,7 +13,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { signInWithProvider } from "@/lib/auth";
 
 // Define Firestore User Type
-interface FirestoreUser {
+export interface FirestoreUser {
 	uid: string;
 	name: string;
 	email: string;

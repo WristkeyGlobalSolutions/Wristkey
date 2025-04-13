@@ -3,37 +3,42 @@ import React, { useEffect, useState } from 'react';
 import * as wallet from "../api";
 import { useRouter } from 'next/navigation';
 import { connectNetwork } from '@/utils/network';
+import { useAuth } from '@/context/AuthContext';
 
 const wallet_connect = () =>
 {
+    const { user, refreshUser } = useAuth();
     //Handles connecting to wallet inside of util
     async function handleWalletConnectViaExtention() 
     {
-        const new_wallet_address = await wallet.connectWalletViaExtention();
+        if(user)
+        {
+            const new_wallet_address = await wallet.connectWalletViaExtention(user);
+        }
     }
 
     async function handleInput(event : React.KeyboardEvent<HTMLInputElement>)
     {
-        if(event.code == "Enter" && event.currentTarget.id == "InputBar")
+        if(event.code == "Enter" && event.currentTarget.id == "InputBar" && user)
         {
             let input = (document.getElementById("InputBar") as HTMLInputElement).value;
             let _test = input;
             //This is a seeded phrase
             if(_test.trim().split(/\s+/).length === 12)
             {
-                wallet.connectWalletViaPhrase(input);
+                wallet.connectWalletViaPhrase(user, input);
             }
             //This is an address
             else
             {
-                wallet.connectWalletViaAddress(input);
+                wallet.connectWalletViaAddress(user, input);
             }
         }
     }
 
     useEffect(() => {
         connectNetwork();
-    }, []);
+    }, [user]);
 
     const router = useRouter();
 

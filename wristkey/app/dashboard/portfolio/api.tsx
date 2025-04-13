@@ -1,6 +1,9 @@
 import { ethers, Wallet } from 'ethers';
 import { provider, network, ETHERSCAN_URL} from '@/utils/network';
-import axios from 'axios';
+import { useAuth } from '@/context/AuthContext';
+import { addWalletToUser, getWalletsFromUser, removeWalletFromUser } from '@/lib/firestore';
+import { FirestoreUser } from '@/context/AuthContext';
+
 
 //const POLYGON_RPC = 'https://rpc-mumbai.maticvigil.com';
 
@@ -73,14 +76,14 @@ async function getABI(contractAddress : string | ethers.Addressable)
 
 
 //Connects a wallet via Metamask / etherium extention
-export async function connectWalletViaExtention()
+export async function connectWalletViaExtention(user : FirestoreUser)
 {
     if(typeof window.ethereum !== "undefined") 
     {
         try 
         {
             const accounts = await window.ethereum.request({method: "eth_requestAccounts"});
-            addWallet(accounts[0]);
+            await addWallet(user, accounts[0]);
             return accounts[0];
         } 
         catch(error) 
@@ -95,12 +98,12 @@ export async function connectWalletViaExtention()
 }
 
 //This seems to be super unsafe
-export async function connectWalletViaPhrase(phrase : string)
+export async function connectWalletViaPhrase(user : FirestoreUser, phrase : string)
 {
     try
     {
         const wallet = Wallet.fromPhrase(phrase);
-        addWallet(wallet.address);       
+        await addWallet(user, wallet.address);       
     }
     catch(error)
     {
@@ -108,64 +111,67 @@ export async function connectWalletViaPhrase(phrase : string)
     }
 }
 
-export async function connectWalletViaAddress(address : string)
+export async function connectWalletViaAddress(user : FirestoreUser, address : string)
 {
-    let tokens : WalletTokenObject[] = await getTokens(address);
-
-    tokens.forEach(token =>
-    {
-        console.log(token.name + " " + ethers.formatUnits(token.balance, token.decimals));
-        console.log(token);
-    });
-
-    addWallet(address);
+    await addWallet(user, address);
 }
 
-export async function getWallets()
+export async function getWallets(user : FirestoreUser)
 {
-    return wallet_addresses;
-}
-
-function addWallet(wallet_address : string)
-{
-    if(!wallet_addresses.includes(wallet_address))
+    if(user)
     {
-        wallet_addresses.push(wallet_address);
+        wallet_addresses = await getWalletsFromUser(user);
+        return wallet_addresses;
     }
 }
 
-function removeWallet(wallet_address : string)
+async function addWallet(user : FirestoreUser, wallet_address : string)
 {
-    wallet_addresses.filter(address => address == wallet_address);
+    if(user)
+    {
+        wallet_addresses = await getWalletsFromUser(user);
+        
+        if(!wallet_addresses.includes(wallet_address))
+        {
+
+            addWalletToUser(user, wallet_address);
+        }
+    }
 }
 
-export async function createWallet()
+async function removeWallet(user : FirestoreUser, wallet_address : string)
+{
+    if(user)
+    {
+        wallet_addresses = await getWalletsFromUser(user);
+        
+        if(!wallet_addresses.includes(wallet_address))
+        {
+            removeWalletFromUser(user, wallet_address);
+        }     
+    }
+}
+
+export async function createWallet(user : FirestoreUser)
 {
     if(provider)
     {
         const new_wallet = Wallet.createRandom(provider);
         new_wallet.connect(provider);
-        addWallet(await new_wallet.getAddress());
+        await addWallet(user, await new_wallet.getAddress());
         return await new_wallet.getAddress();
-    }
-    else
-    {
-        return -1;
     }
 }
 
-export async function createWalletFromPrivateKey(privateKey : string)
+export async function createWalletFromPrivateKey(user : FirestoreUser, privateKey : string)
 {
     if(provider)
     {
         const new_wallet = new Wallet(privateKey, provider);
         new_wallet.connect(provider);
-        addWallet(await new_wallet.getAddress());
-        return await new_wallet.getAddress();
-    }
-    else
-    {
-        return -1;
+        let address = await new_wallet.getAddress();
+        await addWallet(user, address);
+        return address;
     }
 }
 

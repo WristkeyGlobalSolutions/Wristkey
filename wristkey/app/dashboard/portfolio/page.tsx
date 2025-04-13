@@ -1,12 +1,14 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { getContract, connectWalletViaExtention } from "./api";
+import { getContract, connectWalletViaExtention, getWallets } from "./api";
 import WalletNav from "@/components/UI/WalletNav";
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 const Portfolio = () => {
 
-  const [activeTab, setActiveTab] = useState<'mywallet' | 'nfts'>('mywallet')
+  const [activeTab, setActiveTab] = useState<'mywallet' | 'nfts'>('mywallet');
+  const { user, refreshUser } = useAuth();
 
   const handleClick = (page: 'mywallet' | 'nfts') => {
     setActiveTab(page);
@@ -14,8 +16,12 @@ const Portfolio = () => {
   };
 
   useEffect(() => {
-
-	}, []);
+        if(user)
+        {
+            let wallets = getWallets(user);
+            console.log(wallets);
+        }
+	}, [user]);
 
     const router = useRouter();
 
