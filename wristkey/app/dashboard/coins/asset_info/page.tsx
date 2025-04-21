@@ -3,46 +3,51 @@ import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import * as API from "../api";
+import { Alchemy, Network } from "alchemy-sdk";
+
+const settings = 
+{
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+    network: Network.ETH_MAINNET,
+};
 
 export default function AssetInfo() 
 {
-    const [asset, setAsset] = useState<API.DetailedTokenObject | API.DetailedNFTObject | null>(null);
+    const [nft, setNft] = useState<API.NFTCollection | undefined | null>(null);
+    const [token, setToken] = useState<API.Token | undefined | null>(null);
     const[assetDescription, setAssetDescription] = useState<string | null>(null);
 
     const type = useSearchParams().get('type');
-    const id = useSearchParams().get('id');
+    const address = useSearchParams().get('address');
 
     useEffect(() => {
         const fetchAsset = async(id : string | null, type : string | null) =>
         {
-            if(id)
+            if(address)
             {
-                let asset : any;
+                let asset : API.NFTCollection | API.Token | undefined;
                 if(type == "nft")
                 {
-                    asset = await API.getNFT(id);
-                    setAsset(asset);
+                    asset = await API.NFTFromContract(alchemy, address);
+                    setNft(asset);
                 }
         
                 else if(type == "token")
                 {
-                    asset = await API.getToken(id);
-                    setAsset(asset);
+                    asset = await API.TokenFromContract(alchemy, address);
+                    setToken(asset);
                 }
-
-                if(asset)
-                {
-                    setAssetDescription(asset.description.replace(/<[^>]*>/g, ''));
-                }   
             }
             else
             {
-                setAsset(null);
+                setToken(null);
+                setNft(null);
             }
-
         }
 
-        fetchAsset(id, type);
+        const alchemy = new Alchemy(settings);
+
+        fetchAsset(address, type);
     }, []);
 
     return(
@@ -51,22 +56,41 @@ export default function AssetInfo()
             <div className="assetInfo text-center">
 
                 <div className="assetTitle">
-                    {!asset &&
+                    {!nft && !token &&
                     <div>
                         <p>No Asset</p>
                     </div>
                     }
 
-                    {asset &&
+                    {nft &&
                     <div>
                         <p>
-                            {asset.name}
+                            {nft.nfts[0].collection?.name}
                         </p>
 
                         <br></br>
 
                         <img
-                            src={asset.image_small as "image"}
+                            src={nft.nfts[0].collection?.bannerImageUrl as "image"}
+                            alt={`${name} Image`}
+                            width={50}
+                            height={50}
+                            className="mx-auto"
+                        />
+
+                    </div>    
+                    }
+
+                    {token &&
+                    <div>
+                        <p>
+                            {token.metadata.name}
+                        </p>
+
+                        <br></br>
+
+                        <img
+                            src={token.metadata.logo as "image"}
                             alt={`${name} Image`}
                             width={50}
                             height={50}

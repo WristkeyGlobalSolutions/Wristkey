@@ -4,17 +4,25 @@ import Link from "next/link";
 import * as network from "@/utils/network";
 import * as API from "./api";
 import CoinCard from "@/components/coinCard";
-import { Console } from "console";
-import axios from "axios";
+import { Network, Alchemy, Nft, NftCollection, FloorPriceMarketplace } from "alchemy-sdk";
+
+
+const settings = 
+{
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+    network: Network.ETH_MAINNET,
+};
 
 export default function Coins() {
 	const [networkid, setNetworkID] = useState<string | null>(null);
 	const [trending_tokens, setTrendingTokens] = useState<
-    API.PreviewTokenObject[] | null
+    API.Token[] | null
     >(null);
 	const [trending_nfts, setTrendingNFTs] = useState<
-    API.PreviewNFTObject[] | null
+    API.NFTCollection[] | null
 	>(null);
+
+        /*
 	const [search, setSearch] = useState<
     API.GeckoSearchQuery | null
 	>(null);
@@ -40,20 +48,54 @@ export default function Coins() {
             setSearch(null);
         }
     }
+        */
 
 	//Anything updated on startup should go here
 	useEffect(() => {
-		const fetchTokens = async () => {
-			setTrendingTokens(await API.getTrendingTokens());
+		async function fetchTokens()
+        {
+            const tokens = (await API.ALCgetTrendingTokens(alchemy)).slice(0, 10);
+
+            var tokens_defined : API.Token[] = [];
+            tokens.forEach(async(val : [string, number]) =>
+            {
+                var token = (await API.TokenFromContract(alchemy, val[0]));
+
+                if(token)
+                {
+                    tokens_defined.push(token);
+                }
+            }
+            );
+
+			setTrendingTokens(tokens_defined);
 		};
 
-		const fetchNFTs = async () => {
-			setTrendingNFTs(await API.getTrendingNFTs());
+		async function fetchNFTs() 
+        {
+            const nfts = (await API.ALCgetTrendingNFTs(alchemy)).slice(0, 10);
+
+            var nft_defined : API.NFTCollection[] = [];
+            nfts.forEach(async(val : [string, number]) =>
+            {
+                var nft = (await API.NFTFromContract(alchemy, val[0]));
+
+                if(nft)
+                {
+                    nft_defined.push(nft);
+                }
+            }
+            );
+
+			setTrendingNFTs(nft_defined);
 		};
 
 		const fetchNetwork = async () => {
 			setNetworkID(await network.connectNetwork());
-		};
+        };
+
+        
+        const alchemy = new Alchemy(settings);
 
 		//Connect to network on startup
 		fetchNetwork();
@@ -63,9 +105,11 @@ export default function Coins() {
 
 		//fetch trending NFTs
 		fetchNFTs();
+
 	}, []);
 
 	return (
+        
 		<>
 			<div className="main container mx-auto p-6 space-y-8">
 				<div className="networkStatus text-center">
@@ -80,60 +124,6 @@ export default function Coins() {
 					)}
 				</div>
 
-				<div className="search-bar space-y-2">
-					<label className="block text-sm font-medium text-gray-700">
-						Search:
-					</label>
-					<input
-						type="text"
-						id="TokenNFTSearchBar"
-						name="TokenNFTSearchBar"
-						className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Search Tokens and NFTs..."
-                        style={{color: "black"}}
-                        onKeyDown={(event) => handleSearch(event)}
-                    />
-
-                    <div className="searchResult space-y-6">
-                        <div></div>
-
-                        {search ? (
-                            <div>
-                            <p className="text-lg font-semibold">Tokens: ({search.tokens.length})</p>
-                            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {search.tokens.map((token, index) => (
-                                    <li key={index}>
-                                    <CoinCard
-                                        name={token.name}
-                                        thumb={token.image_thumb}
-                                        price={""}
-                                        id ={token.id}
-                                        identifier={"token"}
-                                    />
-                                </li>
-                                ))}
-                            </ul>
-                            <p className="text-lg font-semibold">NFTs: ({search.nfts.length})</p>
-                            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {search.nfts.map((nft, index) => (
-                                <li key={index}>
-                                    <CoinCard
-                                        name={nft.name}
-                                        thumb={nft.image_thumb}
-                                        price={""}
-                                        id={nft.id}
-                                        identifier={"nft"}
-                                    />
-                                </li>
-                                ))}
-                            </ul>
-                            </div>
-                        ) : (
-                            <p></p>
-                        )}
-                    </div>
-				</div>
-
 				<div className="trendingList space-y-6">
 					<div></div>
 					<p className="text-lg font-semibold">Trending Coins:</p>
@@ -142,12 +132,12 @@ export default function Coins() {
 							{trending_tokens.map((token, index) => (
 								<li key={index}>
 									<CoinCard
-										name={token.name}
-										thumb={token.image_thumb}
-										price={token.price_btc + " BTC"}
+										name={token.metadata.name}
+										thumb={token.metadata.logo}
+										price={(token.token_addresses.prices[0] ? token.token_addresses.prices[0].currency + " " + token.token_addresses.prices[0].value : "N/A")}
+                                        address={token.token_addresses.address}
                                         identifier={"token"}
-                                        id={token.id}
-									/>
+                                    />
 								</li>
 							))}
 						</ul>
@@ -163,11 +153,10 @@ export default function Coins() {
 							{trending_nfts.map((nft, index) => (
 								<li key={index}>
 									<CoinCard
-										name={nft.name}
-										thumb={nft.image_thumb}
-										price={`${nft.native_currency_symbol} ${nft.floor_price_in_native_currency}`}
-										volume={`${nft.h24_volume}`}
-                                        id={nft.id}
+										name={nft.nfts[0].collection?.name}
+										thumb={nft.nfts[0].collection?.bannerImageUrl}
+										price={`${((nft.floor_pricing.openSea as FloorPriceMarketplace).floorPrice ? (nft.floor_pricing.openSea as FloorPriceMarketplace).floorPrice : 0)}`}
+                                        address={nft.nfts[0].contract.address}
                                         identifier={"nft"}
                                     />
 								</li>
@@ -206,4 +195,62 @@ export default function Coins() {
 			</div>
 		</>
 	);
+}
+
+{
+    /**
+    <div className="search-bar space-y-2">
+    <label className="block text-sm font-medium text-gray-700">
+        Search:
+    </label>
+    <input
+        type="text"
+        id="TokenNFTSearchBar"
+        name="TokenNFTSearchBar"
+        className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+        placeholder="Search Tokens and NFTs..."
+        style={{color: "black"}}
+        onKeyDown={(event) => handleSearch(event)}
+    />
+
+    <div className="searchResult space-y-6">
+        <div></div>
+
+        {search ? (
+            <div>
+            <p className="text-lg font-semibold">Tokens: ({search.tokens.length})</p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {search.tokens.map((token, index) => (
+                    <li key={index}>
+                    <CoinCard
+                        name={token.name}
+                        thumb={token.image_thumb}
+                        price={""}
+                        id ={token.id}
+                        identifier={"token"}
+                    />
+                </li>
+                ))}
+            </ul>
+            <p className="text-lg font-semibold">NFTs: ({search.nfts.length})</p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {search.nfts.map((nft, index) => (
+                <li key={index}>
+                    <CoinCard
+                        name={nft.name}
+                        thumb={nft.image_thumb}
+                        price={""}
+                        id={nft.id}
+                        identifier={"nft"}
+                    />
+                </li>
+                ))}
+            </ul>
+            </div>
+        ) : (
+            <p></p>
+        )}
+    </div>
+</div>
+*/
 }

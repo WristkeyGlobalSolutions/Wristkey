@@ -3,12 +3,12 @@ import React from "react";
 
 interface CoinCardProps 
 {
-	thumb: string;
-	name: string;
+	thumb: string | undefined | null;
+	name: string | undefined | null;
 	price: string;
 	volume?: string; // Optional prop for volume
     identifier? : string;
-    id? : string;
+    address? : string;
 }
 
 const CoinCard: React.FC<CoinCardProps> = (
@@ -18,7 +18,7 @@ const CoinCard: React.FC<CoinCardProps> = (
 	price,
 	volume,
     identifier,
-    id
+    address
 }) => 
 {
     
@@ -26,7 +26,7 @@ const router = useRouter();
 	return (
 		<button 
         className="p-4 border rounded-md shadow hover:shadow-lg"
-        onClick={() => router.push(`/dashboard/coins/asset_info?type=${identifier}&id=${id}`)}
+        onClick={() => router.push(`/dashboard/coins/asset_info?type=${identifier}&address=${address}`)}
         >
 			<img
 				src={thumb as "image"}
