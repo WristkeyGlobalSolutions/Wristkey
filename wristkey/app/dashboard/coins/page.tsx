@@ -4,25 +4,21 @@ import Link from "next/link";
 import * as network from "@/utils/network";
 import * as API from "./api";
 import CoinCard from "@/components/coinCard";
-import { Network, Alchemy, Nft, NftCollection, FloorPriceMarketplace } from "alchemy-sdk";
+import { Network, Alchemy, FloorPriceMarketplace } from "alchemy-sdk";
 
-
-const settings = 
-{
-    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-    network: Network.ETH_MAINNET,
+const settings = {
+	apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+	network: Network.ETH_MAINNET,
 };
 
 export default function Coins() {
 	const [networkid, setNetworkID] = useState<string | null>(null);
-	const [trending_tokens, setTrendingTokens] = useState<
-    API.Token[] | null
-    >(null);
+	const [trending_tokens, setTrendingTokens] = useState<Token[]>([]);
 	const [trending_nfts, setTrendingNFTs] = useState<
-    API.NFTCollection[] | null
+		API.NFTCollection[] | null
 	>(null);
 
-        /*
+	/*
 	const [search, setSearch] = useState<
     API.GeckoSearchQuery | null
 	>(null);
@@ -50,52 +46,75 @@ export default function Coins() {
     }
         */
 
+	useEffect(() => {
+		console.log("Trending Tokens: ", trending_tokens);
+		console.log("Trending NFTs: ", trending_nfts);
+	}, [trending_tokens, trending_nfts]);
+
+	interface Token {
+		name: string;
+		thumb: string | null;
+		price: string;
+		address: string;
+	}
+
 	//Anything updated on startup should go here
 	useEffect(() => {
-		async function fetchTokens()
-        {
-            const tokens = (await API.ALCgetTrendingTokens(alchemy)).slice(0, 10);
+		async function fetchTokens() {
+			console.log("Fetching Tokens...");
+			const tokens = (await API.ALCgetTrendingTokens(alchemy)).slice(
+				0,
+				10
+			);
+			const tokens_defined: Token[] = await Promise.all(
+				tokens.map(async (val: [string, number]) => {
+					const token = await API.TokenFromContract(alchemy, val[0]);
 
-            var tokens_defined : API.Token[] = [];
-            tokens.forEach(async(val : [string, number]) =>
-            {
-                var token = (await API.TokenFromContract(alchemy, val[0]));
+					if (token) {
+						return {
+							name: token.metadata.name || "Unknown",
+							thumb: token.metadata.logo,
+							price: token.token_addresses.prices[0]
+								? token.token_addresses.prices[0].currency +
+								  " " +
+								  token.token_addresses.prices[0].value
+								: "N/A",
+							address: token.token_addresses.address,
+						};
+					}
+					return null;
+				})
+			).then(
+				(results) =>
+					results.filter((token) => token !== null) as Token[]
+			);
 
-                if(token)
-                {
-                    tokens_defined.push(token);
-                }
-            }
-            );
+			console.log("Tokens Defined: ", tokens_defined);
 
 			setTrendingTokens(tokens_defined);
-		};
+		}
 
-		async function fetchNFTs() 
-        {
-            const nfts = (await API.ALCgetTrendingNFTs(alchemy)).slice(0, 10);
+		async function fetchNFTs() {
+			const nfts = (await API.ALCgetTrendingNFTs(alchemy)).slice(0, 10);
 
-            var nft_defined : API.NFTCollection[] = [];
-            nfts.forEach(async(val : [string, number]) =>
-            {
-                var nft = (await API.NFTFromContract(alchemy, val[0]));
-
-                if(nft)
-                {
-                    nft_defined.push(nft);
-                }
-            }
-            );
+			const nft_defined: API.NFTCollection[] = await Promise.all(
+				nfts.map(async (val: [string, number]) => {
+					const nft = await API.NFTFromContract(alchemy, val[0]);
+					return nft || null;
+				})
+			).then(
+				(results) =>
+					results.filter((nft) => nft !== null) as API.NFTCollection[]
+			);
 
 			setTrendingNFTs(nft_defined);
-		};
+		}
 
 		const fetchNetwork = async () => {
 			setNetworkID(await network.connectNetwork());
-        };
+		};
 
-        
-        const alchemy = new Alchemy(settings);
+		const alchemy = new Alchemy(settings);
 
 		//Connect to network on startup
 		fetchNetwork();
@@ -105,11 +124,9 @@ export default function Coins() {
 
 		//fetch trending NFTs
 		fetchNFTs();
-
 	}, []);
 
 	return (
-        
 		<>
 			<div className="main container mx-auto p-6 space-y-8">
 				<div className="networkStatus text-center">
@@ -132,12 +149,12 @@ export default function Coins() {
 							{trending_tokens.map((token, index) => (
 								<li key={index}>
 									<CoinCard
-										name={token.metadata.name}
-										thumb={token.metadata.logo}
-										price={(token.token_addresses.prices[0] ? token.token_addresses.prices[0].currency + " " + token.token_addresses.prices[0].value : "N/A")}
-                                        address={token.token_addresses.address}
-                                        identifier={"token"}
-                                    />
+										name={token.name}
+										thumb={token.thumb}
+										price={token.price}
+										address={token.address}
+										identifier={"token"}
+									/>
 								</li>
 							))}
 						</ul>
@@ -154,11 +171,24 @@ export default function Coins() {
 								<li key={index}>
 									<CoinCard
 										name={nft.nfts[0].collection?.name}
-										thumb={nft.nfts[0].collection?.bannerImageUrl}
-										price={`${((nft.floor_pricing.openSea as FloorPriceMarketplace).floorPrice ? (nft.floor_pricing.openSea as FloorPriceMarketplace).floorPrice : 0)}`}
-                                        address={nft.nfts[0].contract.address}
-                                        identifier={"nft"}
-                                    />
+										thumb={
+											nft.nfts[0].collection
+												?.bannerImageUrl
+										}
+										price={`${
+											(
+												nft.floor_pricing
+													.openSea as FloorPriceMarketplace
+											).floorPrice
+												? (
+														nft.floor_pricing
+															.openSea as FloorPriceMarketplace
+												  ).floorPrice
+												: 0
+										}`}
+										address={nft.nfts[0].contract.address}
+										identifier={"nft"}
+									/>
 								</li>
 							))}
 						</ul>
@@ -198,7 +228,7 @@ export default function Coins() {
 }
 
 {
-    /**
+	/**
     <div className="search-bar space-y-2">
     <label className="block text-sm font-medium text-gray-700">
         Search:
