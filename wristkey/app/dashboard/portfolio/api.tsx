@@ -3,6 +3,8 @@ import { provider, network, ETHERSCAN_URL} from '@/utils/network';
 import { useAuth } from '@/context/AuthContext';
 import { addWalletToUser, getWalletsFromUser, removeWalletFromUser } from '@/lib/firestore';
 import { FirestoreUser } from '@/context/AuthContext';
+import { Alchemy, TokenBalance } from 'alchemy-sdk';
+import { Token, TokenFromContract } from '../coins/api';
 
 
 //const POLYGON_RPC = 'https://rpc-mumbai.maticvigil.com';
@@ -145,7 +147,7 @@ async function removeWallet(user : FirestoreUser, wallet_address : string)
     {
         wallet_addresses = await getWalletsFromUser(user);
         
-        if(!wallet_addresses.includes(wallet_address))
+        if(wallet_addresses.includes(wallet_address))
         {
             removeWalletFromUser(user, wallet_address);
         }     
@@ -206,6 +208,31 @@ export async function getContract(contractAddress : string | ethers.Addressable,
     }
 }
 
+export async function ALCgetTokens(alchemy: Alchemy, address: ethers.AddressLike) 
+{
+    let balances = await alchemy.core.getTokenBalances(`${address}`);
+    let ret: [Token, string][] = [];
+  
+    for(const balance of balances.tokenBalances) 
+    {
+        const token = await TokenFromContract(alchemy, balance.contractAddress);
+  
+        if(
+            token &&
+            balance.tokenBalance &&
+            BigInt(balance.tokenBalance) > 0 &&
+            token.metadata.decimals
+        ) 
+        {
+            const formatted = ethers.formatUnits(BigInt(balance.tokenBalance), token.metadata.decimals);
+            ret.push([token, formatted]);
+        }
+    }
+  
+    return ret;
+  }
+
+/*
 //I'm not 100% sure what this returns yet. Still working out the kinks
 export async function getTokens(address : ethers.AddressLike) : Promise<WalletTokenObject[]>
 {
@@ -231,4 +258,5 @@ export async function getTokens(address : ethers.AddressLike) : Promise<WalletTo
 
     return ret_tokens;
 }
+    */
   
