@@ -99,8 +99,26 @@ export default function Coins() {
 	return (
 		<div className="bg-gradient-to-r from-blue-700 to-blue-950">
 			<div className="bg-gray-100 rounded-t-3xl flex h-screen">
+<<<<<<< HEAD
                 <div className="w-auto md:w-1/3 lg:w-1/5 2xl:w-1/5 flex place-content-center mt-20">
 					<WalletNav />
+=======
+				<div className="w-auto md:w-1/3 lg:w-1/5 2xl:w-1/5 flex place-content-center mt-20">
+					<WalletNav />
+				</div>
+				<div className="w-auto md:w-2/3 lg:w-4/5 2xl:4/5">
+			<div className="main container mx-auto p-2 space-y-8">
+				<div className="networkStatus text-center">
+					{networkid ? (
+						<p className="text-lg font-semibold text-green-600">
+							Network ID: {networkid}
+						</p>
+					) : (
+						<p className="text-lg font-semibold text-red-600">
+							Not Connected to Network
+						</p>
+					)}
+>>>>>>> 9107bd711473ca853c84ea3439b030d4f711bf1a
 				</div>
 				<div className="w-auto md:w-2/3 lg:w-4/5 2xl:4/5">
 				<div className="main container mx-auto p-2 space-y-8">
@@ -228,6 +246,37 @@ export default function Coins() {
 				</div>
 				</div>
 			</div>
+<<<<<<< HEAD
+=======
+			<div className="directory text-center space-x-4">
+				<Link
+					href="/staking"
+					className="text-blue-600 underline hover:text-blue-800"
+				>
+					Staking
+				</Link>
+				<Link
+					href="/security"
+					className="text-red-600 underline hover:text-red-800"
+				>
+					Security
+				</Link>
+				<Link
+					href="/auth"
+					className="text-green-600 underline hover:text-green-800"
+				>
+					Login
+				</Link>
+				<Link
+					href="/auth"
+					className="text-yellow-600 underline hover:text-yellow-800"
+				>
+					Register
+				</Link>
+			</div>
+		</div>
+		</div>
+>>>>>>> 9107bd711473ca853c84ea3439b030d4f711bf1a
 		</div>
 	);
 }

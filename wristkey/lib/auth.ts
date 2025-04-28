@@ -2,14 +2,98 @@
 import { auth } from "../firebaseConfig";
 import {
 	createUserWithEmailAndPassword,
-	signInWithEmailAndPassword,
 	signOut,
-	updateProfile,
 	signInWithPopup,
 	GoogleAuthProvider,
 	GithubAuthProvider,
+	multiFactor,
+	PhoneAuthProvider,
+	PhoneMultiFactorGenerator,
+	User,
+	TotpMultiFactorGenerator,
+	TotpSecret,
+	signInWithEmailAndPassword,
+	MultiFactorResolver,
+	MultiFactorError,
 } from "firebase/auth";
-import { saveUserToFirestore } from "./firestore";
+import QRCode from "qrcode";
+
+// const recaptchaVerifier = new RecaptchaVerifier(
+// 	auth,
+// 	"recaptcha-container-id",
+// 	undefined
+// );
+
+// export const setUpSMSMulti = async (user: User, phoneNumber: string) => {
+// 	const multi = await multiFactor(user).getSession();
+// 	const manageSession = async (multiFactorSession: MultiFactorSession) => {
+// 		// Specify the phone number and pass the MFA session.
+// 		const phoneInfoOptions = {
+// 			phoneNumber: phoneNumber,
+// 			session: multiFactorSession,
+// 		};
+
+// 		const phoneAuthProvider = new PhoneAuthProvider(auth);
+
+// 		// Send SMS verification code.
+// 		return phoneAuthProvider.verifyPhoneNumber(
+// 			phoneInfoOptions,
+// 			recaptchaVerifier
+// 		);
+// 	};
+// 	const verificationId = await manageSession(multi);
+
+// 	return verificationId;
+// };
+
+export const verifySMSCode = async (
+	user: User,
+	verificationId: string,
+	verificationCode: string,
+	mfaDisplayName: string
+) => {
+	const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
+	const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
+
+	// Complete enrollment.
+	return multiFactor(user).enroll(multiFactorAssertion, mfaDisplayName);
+};
+
+export const setUpTOTP = async (user: User) => {
+	if (!user) {
+		throw new Error("User is not authenticated");
+	}
+	if (!user.email) {
+		throw new Error("User email is not available");
+	}
+	const multiFactorSession = await multiFactor(user).getSession();
+	const totpSecret = await TotpMultiFactorGenerator.generateSecret(
+		multiFactorSession
+	);
+	const totpUri = totpSecret.generateQrCodeUrl(user.email, "Your App's Name");
+
+	const qrCanvas = document.getElementById(
+		"qr-code-canvas"
+	) as HTMLCanvasElement;
+
+	if (qrCanvas) {
+		await QRCode.toCanvas(qrCanvas, totpUri);
+	} else {
+		throw new Error("QR code canvas element not found");
+	}
+	return totpSecret;
+};
+
+export const verifyTOTPCode = async (
+	user: User,
+	totpSecret: TotpSecret,
+	totpCode: string,
+	displayName: string
+) => {
+	const multiFactorAssertion =
+		TotpMultiFactorGenerator.assertionForEnrollment(totpSecret, totpCode);
+	return multiFactor(user).enroll(multiFactorAssertion, displayName);
+};
 
 // Type definition for User object
 export interface AuthUser {
@@ -19,11 +103,8 @@ export interface AuthUser {
 
 export const signUp = async (
 	email: string,
-	password: string,
-	name: string,
-	address: string,
-	age: number
-): Promise<AuthUser> => {
+	password: string
+): Promise<User> => {
 	try {
 		const userCredential = await createUserWithEmailAndPassword(
 			auth,
@@ -31,11 +112,7 @@ export const signUp = async (
 			password
 		);
 		const user = userCredential.user;
-		const userData: AuthUser = { uid: user.uid, email: user.email };
-
-		await updateProfile(user, { displayName: email });
-		await saveUserToFirestore(userData, name, address, age); // Save user to Firestore
-		return userData;
+		return user;
 	} catch (error) {
 		if (error instanceof Error) {
 			throw new Error(error.message);
@@ -49,7 +126,57 @@ export const logout = async (): Promise<void> => {
 	await signOut(auth);
 };
 
-export const signInWithProvider = async (providerType: string): Promise<AuthUser> => {
+export const getEnrolledFactors = async (mfaResolver: MultiFactorResolver) => {
+	const enrolledFactors = mfaResolver.hints.map((info) => info.displayName);
+	console.log("Enrolled factors:", enrolledFactors);
+	if (enrolledFactors[0] === undefined || enrolledFactors[0] === null) {
+		throw new Error("No enrolled factors found.");
+	}
+	return enrolledFactors[0];
+};
+
+export const signInWithTOTP = async (
+	mfaResolver: MultiFactorResolver,
+	selectedIndex: number,
+	otpFromAuthenticator: string
+) => {
+	switch (mfaResolver.hints[selectedIndex].factorId) {
+		case TotpMultiFactorGenerator.FACTOR_ID:
+			const multiFactorAssertion =
+				TotpMultiFactorGenerator.assertionForSignIn(
+					mfaResolver.hints[selectedIndex].uid,
+					otpFromAuthenticator
+				);
+			try {
+				const userCredential = await mfaResolver.resolveSignIn(
+					multiFactorAssertion
+				);
+				return userCredential.user;
+			} catch (error) {
+				if (error instanceof Error) {
+					throw new Error(error.message);
+				} else {
+					console.error("An unknown error occurred:", error);
+					throw new Error("An unknown error occurred.");
+				}
+			}
+			break;
+		case PhoneMultiFactorGenerator.FACTOR_ID:
+			// Handle SMS second factor.
+			throw new Error(
+				"Phone multi-factor authentication is not implemented."
+			);
+			break;
+		default:
+			// Unsupported second factor?
+			throw new Error("Unsupported second factor.");
+			break;
+	}
+};
+
+export const signInWithProvider = async (
+	providerType: string
+): Promise<User> => {
 	let provider;
 	switch (providerType) {
 		case "Google":
@@ -64,21 +191,59 @@ export const signInWithProvider = async (providerType: string): Promise<AuthUser
 	try {
 		const result = await signInWithPopup(auth, provider);
 		const user = result.user;
-		const userData: AuthUser = { uid: user.uid, email: user.email };
-		return userData;
+		return user;
 	} catch (error) {
+		if (
+			(error as MultiFactorError).code ===
+			"auth/multi-factor-auth-required"
+		) {
+			throw error;
+		}
 		if (error instanceof Error) {
 			throw new Error(error.message);
 		} else {
-			throw new Error("An unknown error occurred during Google sign-in.");
+			console.error("An unknown error occurred:", error);
+			throw new Error("An unknown error occurred.");
 		}
 	}
 };
 
+// export const multiFactorSignIn = async (error: Error) => {
+// 	const mfaResolver = getMultiFactorResolver(
+// 		getAuth(),
+// 		error as MultiFactorError
+// 	);
+// 	const enrolledFactors = mfaResolver.hints.map((info) => info.displayName);
+// 	console.log("Enrolled factors:", enrolledFactors);
+// 	const selectedIndex = 0;
+// 	switch (mfaResolver.hints[selectedIndex].factorId) {
+// 		case TotpMultiFactorGenerator.FACTOR_ID:
+// 			const otpFromAuthenticator = "// OTP typed by the user.";
+// 			const multiFactorAssertion =
+// 				TotpMultiFactorGenerator.assertionForSignIn(
+// 					mfaResolver.hints[selectedIndex].uid,
+// 					otpFromAuthenticator
+// 				);
+// 			try {
+// 				await mfaResolver.resolveSignIn(multiFactorAssertion);
+// 				// Successfully signed in!
+// 			} catch (error) {
+// 				// Invalid or expired OTP.
+// 			}
+// 			break;
+// 		case PhoneMultiFactorGenerator.FACTOR_ID:
+// 			// Handle SMS second factor.
+// 			break;
+// 		default:
+// 			// Unsupported second factor?
+// 			break;
+// 	}
+// };
+
 export const signIn = async (
 	email: string,
 	password: string
-): Promise<AuthUser> => {
+): Promise<User> => {
 	try {
 		const userCredential = await signInWithEmailAndPassword(
 			auth,
@@ -86,7 +251,7 @@ export const signIn = async (
 			password
 		);
 		const user = userCredential.user;
-		return { uid: user.uid, email: user.email };
+		return user;
 	} catch (error) {
 		if (error instanceof Error) {
 			throw new Error(error.message);

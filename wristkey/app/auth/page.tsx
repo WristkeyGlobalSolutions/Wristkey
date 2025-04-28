@@ -1,12 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { signUp, signIn } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
+import {
+	getAuth,
+	getMultiFactorResolver,
+	MultiFactorError,
+	MultiFactorResolver,
+} from "firebase/auth";
+import TotpSignIn from "@/components/auth/totp-signin";
 
 export default function Register() {
-	const { user, loading } = useAuth();
+	const {
+		user,
+		loading,
+		signInWithEmail,
+		refreshUser,
+		loginWithProvider,
+		signUpWithEmail,
+	} = useAuth();
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [error, setError] = useState<string | null>(null);
@@ -14,7 +27,8 @@ export default function Register() {
 	const [address, setAddress] = useState<string>("");
 	const [age, setAge] = useState<number>(0);
 	const router = useRouter();
-	const { refreshUser, loginWithProvider } = useAuth();
+	const [isTOTP, setIsTOTP] = useState<boolean>(false);
+	const [resolver, setResolver] = useState<MultiFactorResolver | null>(null);
 
 	const handleRegister = async () => {
 		setError(null);
@@ -24,7 +38,7 @@ export default function Register() {
 		}
 
 		try {
-			await signUp(email, password, name, address, age);
+			await signUpWithEmail(email, password);
 			router.replace("/dashboard"); // Redirect after registration
 			alert("Registration successful! You can now log in.");
 		} catch (err: unknown) {
@@ -44,14 +58,14 @@ export default function Register() {
 			router.replace("/dashboard"); // Redirect after Google sign-in
 		} catch (err: unknown) {
 			if (err instanceof Error) {
-				setError(err.message);
+				handleTOTPSignIn(err);
 			} else {
 				setError("An unexpected error occurred.");
 			}
 		}
 	};
 
-	const [activeTab, setActiveTab] = useState<"register" | "login">(
+	const [activeTab, setActiveTab] = useState<"register" | "login" | "totp">(
 		"register"
 	);
 
@@ -63,10 +77,33 @@ export default function Register() {
 		}
 
 		try {
-			await signIn(email, password);
+			await signInWithEmail(email, password);
 			router.replace("/dashboard"); // Redirect after login
 			alert("Login successful!");
 		} catch (err: unknown) {
+			if (err instanceof Error) {
+				handleTOTPSignIn(err);
+			} else {
+				setError("An unexpected error occurred.");
+			}
+		}
+	};
+
+	const handleTOTPSignIn = async (error: unknown) => {
+		// 1. Verify it's the expected MFA error
+		try {
+			const auth = getAuth();
+			const mfaResolver = getMultiFactorResolver(
+				auth,
+				error as MultiFactorError
+			);
+
+			setIsTOTP(true);
+			setActiveTab("totp");
+			setResolver(mfaResolver);
+
+			return mfaResolver;
+		} catch (err) {
 			if (err instanceof Error) {
 				setError(err.message);
 			} else {
@@ -75,20 +112,18 @@ export default function Register() {
 		}
 	};
 
-	
-		useEffect(() => {
-			if (!loading) {
-				if ( user && !user.isProfileComplete) {
-					router.push("/complete-profile"); // ✅ Redirect if profile is incomplete
-				} else if (user) {
-					router.push("/dashboard"); // ✅ Redirect if user is not logged in
-				}
+	useEffect(() => {
+		if (!loading) {
+			if (user && !user.isProfileComplete) {
+				router.push("/complete-profile"); // ✅ Redirect if profile is incomplete
+			} else if (user) {
+				router.push("/dashboard"); // ✅ Redirect if user is not logged in
 			}
-		}, [user, loading, router]);
-	
-		if (loading) return <p>Loading...</p>;
-		if (user) return null;
+		}
+	}, [user, loading, router]);
 
+	if (loading) return <p>Loading...</p>;
+	if (user) return null;
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -114,10 +149,23 @@ export default function Register() {
 					>
 						Login
 					</button>
+					{isTOTP && (
+						<button
+							onClick={() => setActiveTab("totp")}
+							className={`px-4 py-2 font-bold ${
+								activeTab === "totp"
+									? "text-blue-500 border-b-2 border-blue-500"
+									: "text-gray-500"
+							}`}
+						>
+							TOTP
+						</button>
+					)}
 				</div>
 				{error && <p className="mb-4 text-sm text-red-500">{error}</p>}
 				{activeTab === "register" ? (
 					<div className="space-y-4">
+						{/* Registration inputs */}
 						<input
 							type="text"
 							placeholder="Name"
@@ -172,8 +220,9 @@ export default function Register() {
 							Sign Up with GitHub
 						</button>
 					</div>
-				) : (
+				) : activeTab === "login" ? (
 					<div className="space-y-4">
+						{/* Login inputs */}
 						<input
 							type="email"
 							placeholder="Email"
@@ -194,6 +243,10 @@ export default function Register() {
 						>
 							Log In
 						</button>
+					</div>
+				) : (
+					<div className="space-y-4">
+						<TotpSignIn resolver={resolver!} />
 					</div>
 				)}
 			</div>

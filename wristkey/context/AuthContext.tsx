@@ -7,10 +7,15 @@ import {
 	ReactNode,
 } from "react";
 import { auth, db } from "@/firebaseConfig";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import {
+	MultiFactorError,
+	onAuthStateChanged,
+	signOut,
+	User,
+} from "firebase/auth";
 import { saveIncompleteUserToFirestore } from "@/lib/firestore";
 import { doc, getDoc } from "firebase/firestore";
-import { signInWithProvider } from "@/lib/auth";
+import { signInWithProvider, signIn, signUp } from "@/lib/auth";
 
 // Define Firestore User Type
 export interface FirestoreUser {
@@ -25,8 +30,11 @@ export interface FirestoreUser {
 // Define AuthContext Type
 interface AuthContextType {
 	user: FirestoreUser | null;
+	fireBaseUser: User | null; // Firebase user object
 	loading: boolean;
 	loginWithProvider: (Provider: string) => Promise<void>;
+	signInWithEmail: (email: string, password: string) => Promise<void>;
+	signUpWithEmail: (email: string, password: string) => Promise<void>;
 	logout: () => Promise<void>;
 	refreshUser: () => Promise<void>;
 }
@@ -37,6 +45,7 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<FirestoreUser | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [fireBaseUser, setFireBaseUser] = useState<User | null>(null);
 
 	// ✅ Fetch Firestore User Data
 	const fetchUserData = async (uid: string) => {
@@ -49,6 +58,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		} catch (error) {
 			console.error("Error fetching user data:", error);
 			return null;
+		}
+	};
+
+	const signInWithEmail = async (
+		email: string,
+		password: string
+	): Promise<void> => {
+		try {
+			const firebaseUser = await signIn(email, password);
+			const firestoreUser = await fetchUserData(firebaseUser.uid);
+			if (!firestoreUser) {
+				// If user is new, create a Firestore entry with incomplete profile
+				await saveIncompleteUserToFirestore(firebaseUser);
+				console.log(
+					"New user added to Firestore with incomplete profile."
+				);
+			}
+			setFireBaseUser(firebaseUser); // Set Firebase user object
+			// Reload user data after saving to Firestore
+			const updatedUser = await fetchUserData(firebaseUser.uid);
+			setUser(updatedUser);
+		} catch (error) {
+			if (error instanceof Error) {
+				throw new Error(error.message);
+			} else {
+				throw new Error("An unknown error occurred during sign-in.");
+			}
+		}
+	};
+
+	const signUpWithEmail = async (
+		email: string,
+		password: string
+	): Promise<void> => {
+		try {
+			const firebaseUser = await signUp(email, password);
+			const firestoreUser = await fetchUserData(firebaseUser.uid);
+			if (!firestoreUser) {
+				// If user is new, create a Firestore entry with incomplete profile
+				await saveIncompleteUserToFirestore(firebaseUser);
+				console.log(
+					"New user added to Firestore with incomplete profile."
+				);
+			}
+			setFireBaseUser(firebaseUser); // Set Firebase user object
+			// Reload user data after saving to Firestore
+			const updatedUser = await fetchUserData(firebaseUser.uid);
+			setUser(updatedUser);
+		} catch (error) {
+			if (error instanceof Error) {
+				throw new Error(error.message);
+			} else {
+				throw new Error("An unknown error occurred during sign-in.");
+			}
 		}
 	};
 
@@ -66,11 +129,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					"New user added to Firestore with incomplete profile."
 				);
 			}
+			setFireBaseUser(firebaseUser); // Set Firebase user object
 			// Reload user data after saving to Firestore
 			const updatedUser = await fetchUserData(firebaseUser.uid);
 			setUser(updatedUser);
 		} catch (error) {
-			console.error("Google login error:", error);
+			if (
+				(error as MultiFactorError).code ===
+				"auth/multi-factor-auth-required"
+			) {
+				throw error;
+			}
+			if (error instanceof Error) {
+				throw new Error(error.message);
+			} else {
+				throw new Error(
+					"An unknown error occurred during Google sign-in."
+				);
+			}
 		}
 	};
 
@@ -86,9 +162,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
 			if (firebaseUser) {
 				const firestoreUser = await fetchUserData(firebaseUser.uid);
+				setFireBaseUser(firebaseUser); // Set Firebase user object
 				setUser(firestoreUser);
 			} else {
 				setUser(null);
+				setFireBaseUser(null); // Reset Firebase user object
 			}
 			setLoading(false);
 		});
@@ -104,7 +182,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	return (
 		<AuthContext.Provider
-			value={{ user, loading, loginWithProvider, logout, refreshUser }}
+			value={{
+				user,
+				loading,
+				loginWithProvider,
+				logout,
+				refreshUser,
+				fireBaseUser,
+				signInWithEmail,
+				signUpWithEmail,
+			}}
 		>
 			{children}
 		</AuthContext.Provider>

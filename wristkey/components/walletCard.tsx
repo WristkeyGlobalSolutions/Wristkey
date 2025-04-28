@@ -53,4 +53,8 @@ const WalletCard: React.FC<WalletCardProps> = ({
     );
 };
 
+<<<<<<< HEAD
 export default WalletCard;
+=======
+export default WalletCard;
+>>>>>>> 9107bd711473ca853c84ea3439b030d4f711bf1a
