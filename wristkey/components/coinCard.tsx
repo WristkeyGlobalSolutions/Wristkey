@@ -25,8 +25,8 @@ const CoinCard: React.FC<CoinCardProps> = (
 const router = useRouter();
 	return (
 		<button 
-        className="p-4 border rounded-md shadow hover:shadow-lg"
-        onClick={() => router.push(`/dashboard/coins/asset_info?type=${identifier}&address=${address}`)}
+         className="bg-white p-4 w-96 h-56 border rounded-md shadow hover:shadow-lg"
+         onClick={() => router.push(`/dashboard/coins/asset_info?type=${identifier}&address=${address}`)}
         >
 			<img
 				src={thumb as "image"}

@@ -16,30 +16,39 @@ const WalletCard: React.FC<WalletCardProps> = ({
     privateKey,
     isActive
 }) => {
-    const dropdown = () => {
-        const [open, setOpen] = useState(null);
-    }
     const router = useRouter();
     return (
         <div>
-            {isActive === true ? (
+            <div>
+                <p className="text-left text-lg font-semibold ml-20">{name}</p>
+                <p className="text-left text-sm text-gray-500 ml-20">{address}</p>
+            </div>
+            {isActive && (
                 <div>
-                    <p className="text-left text-lg font-semibold ml-20">{name}</p>
-                    <p className="text-left text-sm text-gray-500 ml-20">{address}</p>
-                    <div className="relative flex justify-center mb-6">
-                        <p className="absolute left-20">Main Wallet</p>
-                        <p className="absolute left-48">Recovery Phrase</p>
-                        <p className="absolute left-80">Rename</p>
-                        <p className="absolute left-96">Delete</p>
+                    <div className="relative flex gap-6 mb-2 ml-20 mt-4">
+                        <button 
+                         className="bg-gray-200 hover:bg-gray-300 rounded-xl p-2 text-sm"
+                        >
+                            Main Wallet
+                        </button>
+                        <button 
+                         className="bg-gray-200 hover:bg-gray-300 rounded-xl p-2 text-sm"
+                        >
+                            Recovery Phrase
+                        </button>
+                        <button 
+                         className="bg-gray-200 hover:bg-gray-300 rounded-xl p-2 text-sm"
+                        >
+                            Rename
+                        </button>
+                        <button 
+                         className="bg-gray-200 hover:bg-gray-300 rounded-xl p-2 text-sm"
+                        >
+                            Delete
+                        </button>
                     </div>
                 </div>
-            ):(
-                <div>
-                    <p className="text-left text-lg font-semibold ml-20">{name}</p>
-                    <p className="text-left text-sm text-gray-500 ml-20">{address}</p>
-                </div>
             )}
-        
         </div>
     );
 };

@@ -51,9 +51,9 @@ export default function AssetInfo()
     }, []);
 
     return(
-    <>
-        <div className="main container mx-auto p-6 space-y-8">
-            <div className="assetInfo text-center">
+    
+        <div className="bg-gradient-to-r from-blue-700 to-blue-950 w-full">
+            <div className="bg-gray-100 rounded-t-3xl min-h-screen w-full text-center">
 
                 <div className="assetTitle">
                     {!nft && !token &&
@@ -121,5 +121,5 @@ export default function AssetInfo()
 
             </div>
         </div>
-    </>)
+    )
 }

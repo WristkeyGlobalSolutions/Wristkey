@@ -4,6 +4,7 @@ import Link from "next/link";
 import * as network from "@/utils/network";
 import * as API from "./api";
 import CoinCard from "@/components/coinCard";
+import WalletNav from "@/components/UI/WalletNav";
 import { Network, Alchemy, FloorPriceMarketplace } from "alchemy-sdk";
 
 const settings = {
@@ -127,8 +128,13 @@ export default function Coins() {
 	}, []);
 
 	return (
-		<>
-			<div className="main container mx-auto p-6 space-y-8">
+		<div className="bg-gradient-to-r from-blue-700 to-blue-950">
+			<div className="bg-gray-100 rounded-t-3xl flex h-screen">
+				<div className="w-auto md:w-1/3 lg:w-1/5 2xl:w-1/5 flex place-content-center mt-20">
+					<WalletNav />
+				</div>
+				<div className="w-auto md:w-2/3 lg:w-4/5 2xl:4/5">
+			<div className="main container mx-auto p-2 space-y-8">
 				<div className="networkStatus text-center">
 					{networkid ? (
 						<p className="text-lg font-semibold text-green-600">
@@ -223,7 +229,9 @@ export default function Coins() {
 					Register
 				</Link>
 			</div>
-		</>
+		</div>
+		</div>
+		</div>
 	);
 }
 

@@ -10,14 +10,15 @@ const managewallets = () => {
 
  const { user, refreshUser } = useAuth();
  const router = useRouter();
- const [active, setActive] = useState(false);
- const handleClick = () => {
-  setActive(!active);
+ const [activeId, setActiveId] = useState<string | null>(null);
+ const handleClick = (id: string) => {
+  setActiveId((prevId) => (prevId === id ? null : id));
  };
+
 
   return (
     <div className="bg-gradient-to-r from-blue-700 to-blue-950">
-        <div className="bg-white rounded-t-3xl p-2">
+        <div className="bg-gray-100 min-h-screen rounded-t-3xl p-2">
           <div className="relative flex items-center justify-center py-2">
             <button
              onClick={() => router.push("/dashboard/mining")}
@@ -32,23 +33,23 @@ const managewallets = () => {
             <div className="ml-72 mt-8">
                 <h1 className="text-black text-xl">My Wallets:</h1>
                 <button
-                 className="p-4 w-2/3 mt-4 border rounded-2xl shadow hover:shadow-lg"
-                 onClick={handleClick}
+                 className="bg-white p-4 w-2/3 mt-4 border rounded-2xl shadow hover:shadow-lg"
+                 onClick={() => handleClick('banana')}
                 >
                   <WalletCard 
                    name="B-A-N-A-N-A-S"
                    address="0x1234567"
-                   isActive={active}
+                   isActive={activeId === 'banana'}
                   />
                 </button>
                 <button
-                 className="p-4 w-2/3 mt-4 border rounded-2xl shadow hover:shadow-lg"
-                 onClick={handleClick}
+                 className="bg-white p-4 w-2/3 mt-4 border rounded-2xl shadow hover:shadow-lg"
+                 onClick={() => handleClick('wristkey')}
                 >
                   <WalletCard
                    name="wristkey"
                    address="0x098765432123345"
-                   isActive={active}
+                   isActive={activeId === 'wristkey'}
                   />
                </button>
                 

@@ -84,8 +84,12 @@ export async function connectWalletViaExtention(user : FirestoreUser)
     {
         try 
         {
-            const accounts = await window.ethereum.request({method: "eth_requestAccounts"});
+            const accounts = await window.ethereum.request({method: "eth_requestAccounts"}) as string;
+            if (!accounts) {
+                throw new Error("No account connected");
+            }
             await addWallet(user, accounts[0]);
+            console.log(`Wallet Connected: ${accounts[0]}`);
             return accounts[0];
         } 
         catch(error) 
