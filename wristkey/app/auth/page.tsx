@@ -10,6 +10,8 @@ import {
 	MultiFactorResolver,
 } from "firebase/auth";
 import TotpSignIn from "@/components/auth/totp-signin";
+import { Button } from "@/components/ui/button";
+import OAuthButton from "@/components/auth/oAuth-button";
 
 export default function Register() {
 	const {
@@ -23,15 +25,19 @@ export default function Register() {
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [error, setError] = useState<string | null>(null);
-	const [name, setName] = useState<string>("");
-	const [address, setAddress] = useState<string>("");
-	const [age, setAge] = useState<number>(0);
+	const [confirmPassword, setConfirmPassword] = useState<string>("");
 	const router = useRouter();
 	const [isTOTP, setIsTOTP] = useState<boolean>(false);
 	const [resolver, setResolver] = useState<MultiFactorResolver | null>(null);
 
 	const handleRegister = async () => {
 		setError(null);
+
+		if (password !== confirmPassword) {
+			setError("Passwords do not match.");
+			return;
+		}
+
 		if (email.length < 5 || password.length < 6) {
 			setError("Email must be valid & password at least 6 characters.");
 			return;
@@ -126,99 +132,69 @@ export default function Register() {
 	if (user) return null;
 
 	return (
-		<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-			<div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+		<div className="flex flex-col items-center justify-center min-h-screen bg-background">
+			<div className="w-full max-w-md p-8 bg-card rounded-lg shadow-md">
 				<div className="flex justify-center mb-6">
-					<button
+					<Button
+						variant={activeTab === "register" ? "default" : "ghost"}
 						onClick={() => setActiveTab("register")}
-						className={`px-4 py-2 font-bold ${
-							activeTab === "register"
-								? "text-blue-500 border-b-2 border-blue-500"
-								: "text-gray-500"
-						}`}
 					>
 						Register
-					</button>
-					<button
+					</Button>
+					<Button
+						variant={activeTab === "login" ? "default" : "ghost"}
 						onClick={() => setActiveTab("login")}
-						className={`px-4 py-2 font-bold ${
-							activeTab === "login"
-								? "text-blue-500 border-b-2 border-blue-500"
-								: "text-gray-500"
-						}`}
 					>
 						Login
-					</button>
+					</Button>
 					{isTOTP && (
-						<button
+						<Button
+							variant={activeTab === "totp" ? "default" : "ghost"}
 							onClick={() => setActiveTab("totp")}
-							className={`px-4 py-2 font-bold ${
-								activeTab === "totp"
-									? "text-blue-500 border-b-2 border-blue-500"
-									: "text-gray-500"
-							}`}
 						>
 							TOTP
-						</button>
+						</Button>
 					)}
 				</div>
-				{error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+				{error && (
+					<p className="mb-4 text-sm text-destructive">{error}</p>
+				)}
 				{activeTab === "register" ? (
 					<div className="space-y-4">
-						{/* Registration inputs */}
-						<input
-							type="text"
-							placeholder="Name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-						/>
 						<input
 							type="email"
 							placeholder="Email"
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+							className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
 						/>
 						<input
 							type="password"
 							placeholder="Password"
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+							className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
 						/>
 						<input
-							type="text"
-							placeholder="Address"
-							value={address}
-							onChange={(e) => setAddress(e.target.value)}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+							type="password"
+							placeholder="Confirm Password"
+							value={confirmPassword}
+							onChange={(e) => setConfirmPassword(e.target.value)}
+							className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
 						/>
-						<input
-							type="number"
-							placeholder="Age"
-							value={age}
-							onChange={(e) => setAge(Number(e.target.value))}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-						/>
-						<button
-							onClick={handleRegister}
-							className="w-full px-4 py-2 mt-6 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-						>
+						<Button className="w-full" onClick={handleRegister}>
 							Sign Up
-						</button>
-						<button
+						</Button>
+						<OAuthButton
+							provider="google"
 							onClick={() => handleProviderSignIn("Google")}
-							className="w-full px-4 py-2 mt-4 text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-						>
-							Sign Up with Google
-						</button>
-						<button
+							message="Sign up"
+						/>
+						<OAuthButton
+							provider="github"
 							onClick={() => handleProviderSignIn("GitHub")}
-							className="w-full px-4 py-2 mt-4 text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-						>
-							Sign Up with GitHub
-						</button>
+							message="Sign up"
+						/>
 					</div>
 				) : activeTab === "login" ? (
 					<div className="space-y-4">
@@ -228,21 +204,28 @@ export default function Register() {
 							placeholder="Email"
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+							className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
 						/>
 						<input
 							type="password"
 							placeholder="Password"
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+							className="w-full px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
 						/>
-						<button
-							onClick={handleLogin}
-							className="w-full px-4 py-2 mt-6 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-						>
+						<Button className="w-full" onClick={handleLogin}>
 							Log In
-						</button>
+						</Button>
+						<OAuthButton
+							provider="google"
+							onClick={() => handleProviderSignIn("Google")}
+							message="Log in"
+						/>
+						<OAuthButton
+							provider="github"
+							onClick={() => handleProviderSignIn("GitHub")}
+							message="Log in"
+						/>
 					</div>
 				) : (
 					<div className="space-y-4">

@@ -18,34 +18,6 @@ import {
 } from "firebase/auth";
 import QRCode from "qrcode";
 
-// const recaptchaVerifier = new RecaptchaVerifier(
-// 	auth,
-// 	"recaptcha-container-id",
-// 	undefined
-// );
-
-// export const setUpSMSMulti = async (user: User, phoneNumber: string) => {
-// 	const multi = await multiFactor(user).getSession();
-// 	const manageSession = async (multiFactorSession: MultiFactorSession) => {
-// 		// Specify the phone number and pass the MFA session.
-// 		const phoneInfoOptions = {
-// 			phoneNumber: phoneNumber,
-// 			session: multiFactorSession,
-// 		};
-
-// 		const phoneAuthProvider = new PhoneAuthProvider(auth);
-
-// 		// Send SMS verification code.
-// 		return phoneAuthProvider.verifyPhoneNumber(
-// 			phoneInfoOptions,
-// 			recaptchaVerifier
-// 		);
-// 	};
-// 	const verificationId = await manageSession(multi);
-
-// 	return verificationId;
-// };
-
 export const verifySMSCode = async (
 	user: User,
 	verificationId: string,
@@ -207,38 +179,6 @@ export const signInWithProvider = async (
 		}
 	}
 };
-
-// export const multiFactorSignIn = async (error: Error) => {
-// 	const mfaResolver = getMultiFactorResolver(
-// 		getAuth(),
-// 		error as MultiFactorError
-// 	);
-// 	const enrolledFactors = mfaResolver.hints.map((info) => info.displayName);
-// 	console.log("Enrolled factors:", enrolledFactors);
-// 	const selectedIndex = 0;
-// 	switch (mfaResolver.hints[selectedIndex].factorId) {
-// 		case TotpMultiFactorGenerator.FACTOR_ID:
-// 			const otpFromAuthenticator = "// OTP typed by the user.";
-// 			const multiFactorAssertion =
-// 				TotpMultiFactorGenerator.assertionForSignIn(
-// 					mfaResolver.hints[selectedIndex].uid,
-// 					otpFromAuthenticator
-// 				);
-// 			try {
-// 				await mfaResolver.resolveSignIn(multiFactorAssertion);
-// 				// Successfully signed in!
-// 			} catch (error) {
-// 				// Invalid or expired OTP.
-// 			}
-// 			break;
-// 		case PhoneMultiFactorGenerator.FACTOR_ID:
-// 			// Handle SMS second factor.
-// 			break;
-// 		default:
-// 			// Unsupported second factor?
-// 			break;
-// 	}
-// };
 
 export const signIn = async (
 	email: string,
