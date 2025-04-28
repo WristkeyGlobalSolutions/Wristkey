@@ -7,6 +7,8 @@ import CoinCard from "@/components/coinCard";
 import WalletNav from "@/components/UI/WalletNav";
 import { Alchemy, FloorPriceMarketplace, Network } from "alchemy-sdk";
 
+let alchemy : Alchemy;
+
 const settings = {
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
     network: Network.ETH_MAINNET,
@@ -52,49 +54,37 @@ export default function Coins() {
 
 	//Anything updated on startup should go here
 	useEffect(() => {
-		const fetchTokens = async () => {
-            let tokens : API.Token[] = [];
-            let trending = await API.ALCgetTrendingTokens(alchemy, 10);
-
-            //Changed from a foreach to this as it works better with async
-            for (let value of trending)
-            {
-                let token = await API.TokenFromContract(alchemy, value[0]);
-                if(token) tokens.push(token);
-            }
-
-			setTrendingTokens(tokens);
-		};
-
-		const fetchNFTs = async () => {
-            let collections : API.NFTCollection[] = [];
-            let trending = await API.ALCgetTrendingNFTs(alchemy, 5);
-
-            for (let value of trending)
-            {
-                let collection = await API.NFTFromContract(alchemy, value[0]);
-                if(collection) collections.push(collection);
-            }
-
-			setTrendingNFTs(collections);
-		};
-
 		const fetchNetwork = async () => {
 			setNetworkID(await network.connectNetwork());
 		};
 
-        const alchemy = new Alchemy(settings);
-
-		//Connect to network on startup
-		fetchNetwork();
-
-		//Fetch trending Tokens
-		fetchTokens();
-
-		//fetch trending NFTs
-		fetchNFTs();        
-
+        alchemy = new Alchemy(settings);
+		fetchNetwork();	   
+            
 	}, []);
+
+    useEffect(() =>
+    {
+        const fetchNFTs = async () => {
+            if(alchemy)
+            {
+                setTrendingNFTs(await API.getTrendingNFTList(alchemy, 5));
+            }
+		};
+
+        fetchNFTs(); 
+    }, [alchemy]);
+
+    useEffect(() =>
+    {
+		const fetchTokens = async () => {
+            if(alchemy)
+            {
+                setTrendingTokens(await API.getTrendingTokenList(alchemy, 10));
+            }
+		};
+        fetchTokens();
+    }, [alchemy]);
 
 	return (
 		<div className="bg-gradient-to-r from-blue-700 to-blue-950">
@@ -164,18 +154,28 @@ export default function Coins() {
                     	</div>
 					</div>
 					
-					<div className="trendingList space-y-6">
+					<div>
 						<p className="text-lg font-semibold">Trending Coins:</p>
 						{trending_tokens ? (
 							<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 								{trending_tokens.map((token, index) => (
-									<li key={index}>
-										<p>{token.metadata.name}</p>
-									</li>
+                        	(	<CoinCard
+                                key={token.token_addresses.address}
+                                name={token.metadata.name ?? "N/A"}
+                                thumb={token.metadata.logo}
+                                address={token.token_addresses.address}
+                                //TODO: This can error has some tokens will not have a value defined for USD!!
+                                price={
+                                    (token.token_addresses.prices[0]) ? 
+                                    `${token.token_addresses.prices[0].value}${token.token_addresses.prices[0].currency}
+                                    ` : ""
+                                }
+                                identifier={"token"}
+                               />)
 								))}
 							</ul>
 						) : (
-							<p className="text-gray-500">No Trending Tokens</p>
+							<p className="text-gray-500">Loading trending tokens...</p>
 						)}
 					</div>
 
@@ -196,7 +196,7 @@ export default function Coins() {
 								))}
 							</ul>
 						) : (
-							<p className="text-gray-500">No Trending NFTs</p>
+							<p className="text-gray-500">Loading trending NFTs...</p>
 						)}
 					</div>
 				</div>

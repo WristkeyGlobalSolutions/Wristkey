@@ -40,7 +40,9 @@ export default function AssetInfo()
             }
         }
 
+
     }
+
 
     useEffect(() => {
         const fetchAsset = async(address : string | null, type : string | null) =>
@@ -144,7 +146,7 @@ export default function AssetInfo()
                 <br></br>
 
                 <button
-                    onClick={() => favoriteAsset}
+                    onClick={() => favoriteAsset()}
                     className="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
                 >
                     Favorite
