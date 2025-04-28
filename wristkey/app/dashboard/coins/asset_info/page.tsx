@@ -90,11 +90,7 @@ export default function AssetInfo()
     }, []);
 
     return(
-<<<<<<< HEAD
-    <>
-=======
-    
->>>>>>> 9107bd711473ca853c84ea3439b030d4f711bf1a
+
         <div className="bg-gradient-to-r from-blue-700 to-blue-950 w-full">
             <div className="bg-gray-100 rounded-t-3xl min-h-screen w-full text-center">
 

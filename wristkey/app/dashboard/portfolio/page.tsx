@@ -64,7 +64,6 @@ const Portfolio = () => {
 								token_data.set(data[0], data[1]);
 							}
 						});
-<<<<<<< HEAD
 					}
 				}
 
@@ -80,31 +79,6 @@ const Portfolio = () => {
 						percentage: "0%",
 					});
 				}
-
-				console.log(assetMap);
-
-=======
-
-						console.log(token_data);
-					}
-				}
-
-				let keys = token_data.keys().toArray();
-				for (let i = 0; i < token_data.size; i++) {
-					assetMap.set(keys[i].metadata.name ?? "N/A", {
-						balance: token_data.get(keys[i]),
-						value:
-							parseFloat(
-								keys[i].token_addresses.prices[0]?.value
-							) * parseFloat(token_data.get(keys[i]) ?? "0"),
-						change: 0,
-						percentage: "0%",
-					});
-				}
-
-				console.log(assetMap);
-
->>>>>>> 9107bd711473ca853c84ea3439b030d4f711bf1a
 				updateWalletData(assetMap);
 			}
 		}
