@@ -2,6 +2,14 @@
 import { db } from "../firebaseConfig";
 import { setDoc, doc, collection, getDocs } from "firebase/firestore";
 import { AuthUser } from "./auth";
+import { deleteDoc } from "firebase/firestore";
+
+export interface Wallet {
+	name: string | undefined | null;
+	address: string;
+	main: boolean;
+	recoveryPhrase?: string;
+}
 
 // Store user data in Firestore
 export const saveUserToFirestore = async (
@@ -28,12 +36,12 @@ export const saveUserToFirestore = async (
 
 export const addWalletToUser = async (
 	user: AuthUser,
-	wallet: string
+	wallet: Wallet
 ): Promise<void> => {
 	try {
 		await setDoc(
-			doc(collection(db, "users", user.uid, "wallets"), wallet),
-			{ wallet }
+			doc(collection(db, "users", user.uid, "wallets"), wallet.address),
+			{ name: wallet.name, address: wallet.address, main: wallet.main, recoveryPhrase: wallet.recoveryPhrase || null },
 		);
 		console.log("Wallet successfully added to user in Firestore.");
 	} catch (error) {
@@ -41,23 +49,35 @@ export const addWalletToUser = async (
 	}
 };
 
+export const updateWalletInUser = async (
+	user: AuthUser,
+	wallet: Wallet
+): Promise<void> => {
+	try {
+		await setDoc(
+			doc(collection(db, "users", user.uid, "wallets"), wallet.address),
+			{ name: wallet.name, address: wallet.address, main: wallet.main, recoveryPhrase: wallet.recoveryPhrase || null },
+			{ merge: true }
+		);
+		console.log("Wallet successfully updated in user in Firestore.");
+	} catch (error) {
+		console.error("Error updating wallet in user:", error);
+	}
+}
+
 export const removeWalletFromUser = async (
 	user: AuthUser,
 	wallet: string
 ): Promise<void> => {
 	try {
-		await setDoc(
-			doc(collection(db, "users", user.uid, "wallets"), wallet),
-			{ wallet },
-			{ merge: true }
-		);
+		await deleteDoc(doc(collection(db, "users", user.uid, "wallets"), wallet));
 		console.log("Wallet successfully removed from user in Firestore.");
 	} catch (error) {
 		console.error("Error removing wallet from user:", error);
 	}
 };
 
-export const getWalletsFromUser = async (user: AuthUser): Promise<string[]> => {
+export const getWalletsFromUser = async (user: AuthUser): Promise<Wallet[]> => {
 	try {
 		const walletsRef = collection(db, "users", user.uid, "wallets");
 		const walletsSnapshot = await getDocs(walletsRef);
@@ -66,7 +86,7 @@ export const getWalletsFromUser = async (user: AuthUser): Promise<string[]> => {
 				"Wallets found for user:",
 				walletsSnapshot.docs.map((doc) => doc.id)
 			);
-			return walletsSnapshot.docs.map((doc) => doc.id);
+			return walletsSnapshot.docs.map((doc) => doc.data() as Wallet);
 		} else {
 			console.log("No wallets found for user.");
 			return [];

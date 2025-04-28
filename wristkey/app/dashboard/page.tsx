@@ -2,7 +2,6 @@
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { addWalletToUser } from "@/lib/firestore"; // Adjust the import path as necessary
 
 export default function Dashboard() {
 	const { user, logout, loading } = useAuth();
@@ -20,16 +19,6 @@ export default function Dashboard() {
 
 	if (loading) return <p>Loading...</p>;
 	if (!user) return null;
-
-	const testwallet = async () => {
-		const wallet = "testwalletSecond"; // Replace with your wallet address
-		try {
-			await addWalletToUser(user, wallet);
-			console.log("Wallet successfully added to user in Firestore.");
-		} catch (error) {
-			console.error("Error adding wallet to user:", error);
-		}
-	}
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
@@ -54,8 +43,6 @@ export default function Dashboard() {
 				>
 					Logout
 				</button>
-
-				<button onClick={testwallet}>Test wallet</button>
 			</div>
 		</div>
 	);

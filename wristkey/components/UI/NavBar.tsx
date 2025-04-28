@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext"; // Adjust the path as needed
 import { useRouter } from "next/navigation";
-import WalletNav from "@/components/UI/WalletNav";
 
 const NavBar: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<'home' | 'about' | 'accessories' | 'wallet'>('home');
@@ -37,7 +36,7 @@ const NavBar: React.FC = () => {
 							Home
 						</button>
 						<button
-							onClick={() => [router.push("/"), handleClick('about')]}
+							onClick={() => [router.push("/about"), handleClick('about')]}
 							className={`text-gray-400 align-text-bottom text-xl py-2 px-4 ${activeTab === 'about' ? 'text-gray-50' : ''}`}
 						>
 							About
