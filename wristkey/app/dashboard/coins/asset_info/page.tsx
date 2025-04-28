@@ -4,6 +4,8 @@ import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import * as API from "../api";
 import { Alchemy, Network } from "alchemy-sdk";
+import { useAuth } from "@/context/AuthContext";
+import { addFavoriteToUser, getFavoritesForUser, removeFavoriteFromUser } from "@/lib/firestore";
 
 const settings = 
 {
@@ -15,27 +17,64 @@ export default function AssetInfo()
 {
     const [nft, setNft] = useState<API.NFTCollection | undefined | null>(null);
     const [token, setToken] = useState<API.Token | undefined | null>(null);
-    const[assetDescription, setAssetDescription] = useState<string | null>(null);
+    const[assetDescription, setAssetDescription] = useState<string | undefined | null>(null);
+    const[assetAddress, setAssetAddress] = useState<string | undefined | null>(null);
 
+    const { user, logout, loading } = useAuth();
     const type = useSearchParams().get('type');
     const address = useSearchParams().get('address');
 
+    async function favoriteAsset()
+    {
+        if(user && assetAddress)
+        {
+            let favorites = await getFavoritesForUser(user);
+        
+            if(!favorites.includes(assetAddress))
+            {
+                addFavoriteToUser(user, assetAddress);
+            }
+            else
+            {
+                removeFavoriteFromUser(user, assetAddress);
+            }
+        }
+
+    }
+
     useEffect(() => {
-        const fetchAsset = async(id : string | null, type : string | null) =>
+        const fetchAsset = async(address : string | null, type : string | null) =>
         {
             if(address)
             {
+                
                 let asset : API.NFTCollection | API.Token | undefined;
                 if(type == "nft")
                 {
-                    asset = await API.NFTFromContract(alchemy, address);
-                    setNft(asset);
+                    try
+                    {
+                        asset = await API.NFTFromContract(alchemy, address);
+                        setNft(asset);
+                        setAssetAddress(asset?.contract_address);
+                    }
+                    catch(e)
+                    {
+
+                    }
                 }
         
                 else if(type == "token")
                 {
-                    asset = await API.TokenFromContract(alchemy, address);
-                    setToken(asset);
+                    try
+                    {
+                        asset = await API.TokenFromContract(alchemy, address);
+                        setToken(asset);
+                        setAssetAddress(asset?.token_addresses.address);
+                    }
+                    catch(e)
+                    {
+
+                    }
                 }
             }
             else
@@ -52,8 +91,8 @@ export default function AssetInfo()
 
     return(
     <>
-        <div className="main container mx-auto p-6 space-y-8">
-            <div className="assetInfo text-center">
+        <div className="bg-gradient-to-r from-blue-700 to-blue-950 w-full">
+            <div className="bg-gray-100 rounded-t-3xl min-h-screen w-full text-center">
 
                 <div className="assetTitle">
                     {!nft && !token &&
@@ -103,6 +142,13 @@ export default function AssetInfo()
 
 
                 <br></br>
+
+                <button
+                    onClick={() => favoriteAsset}
+                    className="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
+                >
+                    Favorite
+                </button>
 
                 <div className="Description">
                     {!assetDescription &&

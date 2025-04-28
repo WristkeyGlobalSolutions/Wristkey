@@ -1,8 +1,37 @@
 "use client";
 import axios from "axios";
-import {Network, Alchemy, Nft, GetFloorPriceResponse, TokenAddressRequest, TokenMetadataResponse, TokenPriceByAddressResult, AssetTransfersCategory, AssetTransfersResponse} from "alchemy-sdk";
+import {Network, Alchemy, Nft, GetFloorPriceResponse, TokenAddressRequest, TokenMetadataResponse, TokenPriceByAddressResult, AssetTransfersCategory, AssetTransfersResponse, BaseNftCollection} from "alchemy-sdk";
+import { useMemo } from "react";
+
+
+
 
 /*
+//Documentation: https://docs.coingecko.com/reference/trending-search
+export type PreviewTokenObject = 
+{
+    id: string;
+    name: string;
+    symbol: string; //Currency symbol
+    image_thumb: string; //Icon for this Token
+    image_large: string;
+
+    price_btc : number;
+    price_usd : number;
+}
+
+export type PreviewNFTObject = 
+{
+    id: string;
+    name: string;
+    symbol: string;
+    image_thumb: string;
+    native_currency_symbol: string;
+    h24_volume : string;
+
+    floor_price_in_native_currency : number;
+}
+
 export type DetailedTokenObject = 
 {
     id : string;
@@ -36,32 +65,9 @@ export type GeckoSearchQuery =
     nfts: PreviewNFTObject[];
     tokens: PreviewTokenObject[];
 }
+*/
 
-//Documentation: https://docs.coingecko.com/reference/trending-search
-export type PreviewTokenObject = 
-{
-    id: string;
-    name: string;
-    symbol: string; //Currency symbol
-    image_thumb: string; //Icon for this Token
-    image_large: string;
-
-    price_btc : number;
-    price_usd : number;
-}
-
-export type PreviewNFTObject = 
-{
-    id: string;
-    name: string;
-    symbol: string;
-    image_thumb: string;
-    native_currency_symbol: string;
-    h24_volume : string;
-
-    floor_price_in_native_currency : number;
-}
-
+/*
 export async function getNFT(id : string) : Promise<DetailedNFTObject | null>
 {
     try 
@@ -92,7 +98,9 @@ export async function getNFT(id : string) : Promise<DetailedNFTObject | null>
         return null;    
     }   
 }
+*/
 
+/*
 export async function getToken(id : string) : Promise<DetailedTokenObject | null>
 {
     try 
@@ -128,25 +136,24 @@ export async function getToken(id : string) : Promise<DetailedTokenObject | null
         return null;    
     }  
 }
-
+*/
 
 //Gets a list of the top 10 trending Tokens
-export async function getTrendingTokens(): Promise<PreviewTokenObject[]> 
+export async function getTrendingTokens(): Promise<Token[]> 
 {
     try 
     {
         const response = await axios.get(process.env.NEXT_PUBLIC_COINGECKO_URL + 'search/trending');
-        const trending = response.data.coins.map((coin: any) => 
-        ({
-            id: coin.item.id,
-            name: coin.item.name,
-            symbol: coin.item.symbol,
-            image_thumb: coin.item.thumb,
-            image_large: coin.item.large,
-            price_btc: coin.item.price_btc,
-            price_usd: coin.item.data.price,
-        }));
-  
+
+        let trending : Token[] = [];
+
+        trending = response.data.coins.map((coin: any) => 
+            ({
+                name: coin.item.name,
+                image: coin.item.thumb,
+                id: coin.item.id
+            }));
+
         return trending;
     } 
     catch(error)
@@ -157,20 +164,16 @@ export async function getTrendingTokens(): Promise<PreviewTokenObject[]>
 }
 
 //Gets a list of the top 7 trending NFTs
-export async function getTrendingNFTs(): Promise<PreviewNFTObject[]> 
+export async function getTrendingNFTs(): Promise<NFTCollection[]> 
 {
     try 
     {
         const response = await axios.get(process.env.NEXT_PUBLIC_COINGECKO_URL + 'search/trending');
         const trending = response.data.nfts.map((nft: any) => 
         ({
-            id: nft.id,
             name: nft.name,
-            symbol: nft.symbol,
-            image_thumb: nft.thumb,
-            native_currency_symbol: nft.native_currency_symbol,
-            floor_price_in_native_currency : nft.floor_price_in_native_currency,
-            h24_volume : nft.data.h24_volume
+            image: nft.thumb,
+            id: nft.id
         }));
 
         return trending;
@@ -193,28 +196,20 @@ export async function searchGecko(input : string, limiters : string[] = ["exchan
         {
             tokens: response.data.coins.map((coin : any) => 
             ({
-                id: coin.id,
                 name: coin.name,
-                symbol: coin.symbol,
-                image_thumb: coin.thumb,
-                image_large: coin.large,
-                price_btc: "",
-                price_usd: "",
+                image: coin.thumb,
+                id: coin.id
             })),
 
-            nfts: response.data.nfts.map((nft : any) =>
+            nft_collections: response.data.nfts.map((nft : any) =>
             ({
-                id: nft.id,
                 name: nft.name,
-                symbol: nft.symbol,
-                image_thumb: nft.thumb,
-                native_currency_symbol: "",
-                floor_price_in_native_currency : "",
-                h24_volume : ""
+                image: nft.thumb,
+                id: nft.id
             }))
         }
 
-        if(ret.tokens.length == 0 && ret.nfts.length == 0)
+        if(ret.tokens.length == 0 && ret.nft_collections.length == 0)
         {
             return null;
         }
@@ -227,14 +222,32 @@ export async function searchGecko(input : string, limiters : string[] = ["exchan
         return null;    
     }
 }
-*/
 
 //USING ALCHEMY
+export type GeckoSearchQuery =
+{
+    tokens : Token[],
+    nft_collections: NFTCollection[]
+}
+
+export type SearchQuery =
+{
+    tokens : Token[],
+    nft_collections: NFTCollection[]
+}
 
 export type Token =
 {
     metadata: TokenMetadataResponse,
     token_addresses: TokenPriceByAddressResult
+};
+
+export type NFTCollection =
+{
+    nfts: Nft[],
+    floor_pricing: GetFloorPriceResponse,
+    contract_address: string,
+    collection?: BaseNftCollection
 };
 
 //Gets a token given a contract
@@ -274,12 +287,6 @@ export async function TokenFromContract(alchemy : Alchemy, address : string) : P
     }
 }
 
-export type NFTCollection =
-{
-    nfts: Nft[],
-    floor_pricing: GetFloorPriceResponse
-};
-
 export async function NFTFromContract(alchemy : Alchemy, address : string) : Promise<NFTCollection | undefined>
 {
     var nfts;
@@ -308,62 +315,91 @@ export async function NFTFromContract(alchemy : Alchemy, address : string) : Pro
         let collection : NFTCollection = 
         {
             nfts: nfts.nfts,
-            floor_pricing: floor_pricing
+            floor_pricing: floor_pricing,
+            collection: nfts.nfts[0].collection,
+            contract_address: nfts.nfts[0].contract.address
         };
 
         return collection;
     }   
 }
 
+export async function ALCsearch(alchemy : Alchemy, input : string) : Promise<Token | NFTCollection | undefined>
+{
+    let token = await TokenFromContract(alchemy, input);
+
+    if(!token)
+    {
+        let nft = await NFTFromContract(alchemy, input);
+
+        if(nft)
+        {
+            return nft;
+        }
+    }
+    else
+    {
+        return token;
+    }
+}
+
 //Sorts through asset transfers and finds the trending tokens
 //Number is amount of transfers to look through
-export async function ALCgetTrendingTokens(alchemy : Alchemy, count : number = 1000, hours : number = 1) : Promise<[string, number][]>
+export async function ALCgetTrendingTokens(alchemy : Alchemy, splice : number, count : number = 10, hours : number = 24) : Promise<[string, number][]>
 {
-    return await getTrending(alchemy, [AssetTransfersCategory.ERC20], count, hours);
+    return await getTrending(alchemy, splice, [AssetTransfersCategory.ERC20], count, hours);
 }
 
-export async function ALCgetTrendingNFTs(alchemy : Alchemy, count : number = 1000, hours : number = 1) : Promise<[string, number][]>
+export async function ALCgetTrendingNFTs(alchemy : Alchemy, splice : number, count : number = 10, hours : number = 24) : Promise<[string, number][]>
 {
-    return await getTrending(alchemy, [AssetTransfersCategory.ERC721, AssetTransfersCategory.ERC1155], count, hours);
+    return await getTrending(alchemy, splice, [AssetTransfersCategory.ERC721, AssetTransfersCategory.ERC1155], count, hours);
 }
+
 
 //Be careful with how many hours you call our from! This can take a while
+//Try to get this on some backend and make it pingable
 
 //Count is amount per block, hour is how many blocks it should check from
-async function getTrending(alchemy : Alchemy, category : AssetTransfersCategory[], count : number, hours : number)
+//Look into desk screeners || coin geckos --> switch back to coingecko
+
+const SAMPLE_COUNT = 20; // number of random samples
+const BLOCK_RANGE = 10; // how many blocks per sample
+
+async function getTrending(alchemy : Alchemy, splice : number, category : AssetTransfersCategory[], count : number, hours : number)
 {
-    const curr_block = await alchemy.core.getBlockNumber();
-    const blocksInxHours = Math.floor((hours * 60 * 60) / 12);
-    const start_block = curr_block - blocksInxHours;
+    const latest = await alchemy.core.getBlockNumber();
+    const earliest = (latest - Math.floor((hours * 60 * 60) / 12));
 
     let pageKey: string | undefined = undefined;
-    const allTransfers = [];
-    
-    do
+    const allTransfers : string[] = [];
+
+    for (let i = 0; i < SAMPLE_COUNT; i++)
     {
-        const ret : AssetTransfersResponse = (await alchemy.core.getAssetTransfers({
-            fromBlock: `0x${start_block.toString(16)}`,
-            toBlock: "latest",
+        const start = Math.floor(Math.random() * (latest - earliest - BLOCK_RANGE)) + earliest;
+        const end = (start + BLOCK_RANGE);
+
+        const ret = await alchemy.core.getAssetTransfers({
+            fromBlock: `0x${start.toString(16)}`,
+            toBlock: `0x${end.toString(16)}`,
             category: category,
             maxCount: count,
-            pageKey
-        }));
+        });
 
-        allTransfers.push(...ret.transfers);
-        pageKey = ret.pageKey;
-
-    }while(pageKey);
+        for (let transfer of ret.transfers) {
+            if (transfer.rawContract?.address) {
+                allTransfers.push(transfer.rawContract.address);
+            }
+        }
+    }
 
     const counts : {[key: string]: number} = {};
-    for (const tx of allTransfers) {
-        if(tx.rawContract.address)
-        {
-            counts[tx.rawContract.address] = (counts[tx.rawContract.address] || 0) + 1;
-        }  
+    for(let i = 0; i < allTransfers.length; i++)
+    {
+        counts[allTransfers[i]] = (counts[allTransfers[i]] || 0) + 1;
     }
     
     const sorted = Object.entries(counts)
     .sort((a, b) => b[1] - a[1]);
 
-    return sorted;
+    return sorted.splice(0, splice);
 }

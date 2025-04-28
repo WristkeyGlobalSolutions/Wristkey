@@ -1,18 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext"; // Adjust the path as needed
-import { useRouter, usePathname } from "next/navigation";
-import Dropdown from "./Dropdown";
+import { useRouter } from "next/navigation";
+import WalletNav from "@/components/UI/WalletNav";
 
 const NavBar: React.FC = () => {
+	const [activeTab, setActiveTab] = useState<'home' | 'about' | 'accessories' | 'wallet'>('home');
+		  const handleClick = (page: 'home' | 'about' | 'accessories' | 'wallet') => {
+			setActiveTab(page);
+		  };
 	const { user, logout } = useAuth();
 	const router = useRouter();
-	const pathname = usePathname();
-	const location = pathname == "/";
 
 	return (
-		<nav className="bg-gray-900 text-white p-4 shadow-md">
+		<nav className="bg-gradient-to-r from-blue-700 to-blue-950 text-white p-4 shadow-md w-full">
 			<div className="container mx-auto flex justify-between items-center">
 				<button
 					onClick={() => router.push("/")}
@@ -28,21 +30,30 @@ const NavBar: React.FC = () => {
 
 				<div className="transparent">
 					<div className="flex justify-between align-text-bottom">
-						<button
-							onClick={() => router.push("/")}
-							className="text-white align-text-bottom text-xl py-2 px-4"
+					<button
+							onClick={() => [router.push("/"), handleClick('home')]}
+							className={`text-gray-400 align-text-bottom text-xl py-2 px-4 ${activeTab === 'home' ? 'text-gray-50' : ''}`}
 						>
-							About Crypto
+							Home
 						</button>
 						<button
-							onClick={() => router.push("/")}
-							className="text-white text-center text-xl py-2 px-4"
+							onClick={() => [router.push("/"), handleClick('about')]}
+							className={`text-gray-400 align-text-bottom text-xl py-2 px-4 ${activeTab === 'about' ? 'text-gray-50' : ''}`}
 						>
-							Watch
+							About
 						</button>
-						<span>
-							<Dropdown />
-						</span>
+						<button
+							onClick={() => [router.push("/"), handleClick('accessories')]}
+							className={`text-gray-400 align-text-bottom text-xl py-2 px-4 ${activeTab === 'accessories' ? 'text-gray-50' : ''}`}
+						>
+							Accessories
+						</button>
+						<button
+							onClick={() => [router.push("/dashboard/portfolio"), handleClick('wallet')]}
+							className={`text-gray-400 align-text-bottom text-xl py-2 px-4 ${activeTab === 'wallet' ? 'text-gray-50' : ''}`}
+						>
+							Wallet
+						</button>
 					</div>
 				</div>
 

@@ -221,7 +221,7 @@ export async function ALCgetTokens(alchemy: Alchemy, address: ethers.AddressLike
             token &&
             balance.tokenBalance &&
             BigInt(balance.tokenBalance) > 0 &&
-            token.metadata.decimals
+            token.metadata?.decimals
         ) 
         {
             const formatted = ethers.formatUnits(BigInt(balance.tokenBalance), token.metadata.decimals);

@@ -7,6 +7,7 @@ const Dropdown: React.FC = () => {
 	const router = useRouter();
 
 	const [isOpen, setIsOpen] = useState(false); // State to toggle the dropdown
+	const [selectedCoin, setSelectedCoin] = useState("Coin");
 
 	// Function to toggle the dropdown visibility
 	const toggleDropdown = () => {
@@ -34,68 +35,34 @@ const Dropdown: React.FC = () => {
 		return () => document.removeEventListener("click", handleClickOutside);
 	}, []);
 
+	const handleItemClick = (name: string) => {
+		setSelectedCoin(name);   // Update button text
+		setIsOpen(false);        // Close dropdown
+	};
+
 	return (
 		<div className="relative dropdown">
 			<button
 				onClick={toggleDropdown}
-				className="text-white text-center text-xl py-2 px-4 hover:text-gray-400"
+				className="text-black hover:text-gray-400"
 			>
-				Wallet
+				{selectedCoin}
 			</button>
 
 			{/* Dropdown menu */}
 			{isOpen && (
-				<div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200  shadow-lg z-10">
+				<div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 shadow-lg z-10">
 					<ul className="py-2">
-						<li>
-							<a
-								href="/dashboard/portfolio"
-								onClick={() =>
-									router.push("/dashboard/portfolio")
-								}
-								className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-							>
-								Portfolio
-							</a>
-						</li>
-						<li>
-							<a
-								href="/dashboard/coins"
-								onClick={() =>
-									router.push("/dashboard/coins")
-								}
-								className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-							>
-								Explore
-							</a>
-						</li>
-						<li>
-							<a
-								href="/"
-								onClick={() => router.push("/")}
-								className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-							>
-								Swap
-							</a>
-						</li>
-						<li>
-							<a
-								href="/"
-								onClick={() => router.push("/")}
-								className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-							>
-								Favorites
-							</a>
-						</li>
-						<li>
-							<a
-								href="/"
-								onClick={() => router.push("/")}
-								className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-							>
-								Mining
-							</a>
-						</li>
+						{["Bitcoin", "Ethereum", "Solana", "Dogecoin", "Avax"].map((coin) => (
+							<li key={coin}>
+								<span
+									onClick={() => handleItemClick(coin)}
+									className="block px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer"
+								>
+									{coin}
+								</span>
+							</li>
+						))}
 					</ul>
 				</div>
 			)}

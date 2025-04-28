@@ -77,6 +77,58 @@ export const getWalletsFromUser = async (user: AuthUser): Promise<string[]> => {
 	}
 };
 
+export const addFavoriteToUser = async (
+	user: AuthUser,
+	favorite: string
+): Promise<void> => {
+	try {
+		await setDoc(
+			doc(collection(db, "users", user.uid, "favorites"), favorite),
+			{ favorite }
+		);
+		console.log("Favorite successfully added to user in Firestore.");
+	} catch (error) {
+		console.error("Error adding favorite to user:", error);
+	}
+};
+
+export const removeFavoriteFromUser = async (
+	user: AuthUser,
+	favorite: string
+): Promise<void> => {
+	try {
+		await setDoc(
+			doc(collection(db, "favorite", user.uid, "favorites"), favorite),
+			{ favorite },
+			{ merge: true }
+		);
+		console.log("Favorite successfully removed from user in Firestore.");
+	} catch (error) {
+		console.error("Error removing favorite from user:", error);
+	}
+};
+
+export const getFavoritesForUser = async (user: AuthUser): Promise<string[]> => {
+	try {
+		const favRef = collection(db, "users", user.uid, "favorites");
+		const favSnapshot = await getDocs(favRef);
+		if (!favSnapshot.empty) {
+			console.log(
+				"Favorites found for user:",
+				favSnapshot.docs.map((doc) => doc.id)
+			);
+			return favSnapshot.docs.map((doc) => doc.id);
+		} else {
+			console.log("No favorites found for user.");
+			return [];
+		}
+	} catch (error) {
+		console.error("Error fetching favorites from user:", error);
+		return [];
+	}
+};
+
+
 export const updateUserInFirestore = async (
 	user: AuthUser,
 	updates: Partial<AuthUser>
