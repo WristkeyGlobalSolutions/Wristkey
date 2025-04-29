@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import WalletNav from "@/components/ui/WalletNav";
+import WalletNav from "@/components/UI/WalletNav";
 import { useAuth } from "@/context/AuthContext";
 import { Favorite, getFavoritesForUser } from "@/lib/firestore";
 import * as API from "@/app/dashboard/coins/api";
@@ -17,6 +17,11 @@ const Favorites = () => {
 	const [favorites, setFavorites] = useState<Favorite[]>([]);
 	const [favoriteNFTs, setFavoriteNFTs] = useState<API.NFTCollection[]>([]);
 	const [favoriteTokens, setFavoriteTokens] = useState<API.Token[]>([]);
+	const [activeTab, setActiveTab] = useState<"tokens" | "nfts">("tokens");
+
+	const handleClick = (page: "tokens" | "nfts") => {
+		setActiveTab(page);
+	};
 
 	useEffect(() => {
 		if (!user) return;
@@ -62,11 +67,26 @@ const Favorites = () => {
 
 	return (
 		<div className="bg-gradient-to-r from-blue-700 to-blue-950 h-screen">
-				<WalletNav currentTab="favorites" />
+			<div className="bg-gray-100 rounded-t-3xl h-screen">
+			<WalletNav currentTab="favorites" />
 			<div className="mx-auto max-w-7xl p-6 w-[90%] pl-[20%]">
 				<h1 className="text-4xl text-center p-2">Favorites</h1>
+				<div className="flex justify-center mt-4 mb-4">
+					<button
+					 className={`w-full py-2 text-center text-xl rounded-tl-xl hover:bg-gray-300 ${activeTab === 'tokens' ? 'bg-gray-300' : ''}`}
+					 onClick={() => handleClick("tokens")}
+					>
+						Tokens
+					</button>
+					<button
+					 className={`w-full py-2 text-center text-xl rounded-tr-xl hover:bg-gray-300 ${activeTab === 'nfts' ? 'bg-gray-300' : ''}`}
+					 onClick={() => handleClick("nfts")}
+					>
+						NFTs
+					</button>
+				</div>
+				{activeTab === "nfts" ? (
 				<div>
-					<p className="text-lg font-semibold">Trending NFTs:</p>
 					{favoriteNFTs ? (
 						<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 							{favoriteNFTs.map((nft, index) => (
@@ -92,11 +112,11 @@ const Favorites = () => {
 							))}
 						</ul>
 					) : (
-						<p className="text-gray-500">No Trending NFTs</p>
+						<p className="text-gray-500">No Favorite NFTs</p>
 					)}
 				</div>
+				):(
 				<div className="trendingList space-y-6">
-					<p className="text-lg font-semibold">Trending Coins:</p>
 					{favoriteTokens ? (
 						<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 							{favoriteTokens.map((token, index) => (
@@ -118,9 +138,11 @@ const Favorites = () => {
 							))}
 						</ul>
 					) : (
-						<p className="text-gray-500">No Trending Tokens</p>
+						<p className="text-gray-500">No Favorite Tokens</p>
 					)}
 				</div>
+				)}
+			</div>
 			</div>
 		</div>
 	);

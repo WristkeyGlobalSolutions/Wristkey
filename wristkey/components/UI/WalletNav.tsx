@@ -27,7 +27,7 @@ const WalletNav: React.FC<{ currentTab: "portfolio" | "explore" | "swap" | "favo
 				</button>
 			</div> */}
 			{isNavVisible && (
-				<div className="fixed top-[17vh] left-0 w-64 h-fit bg-white shadow-lg rounded-r-lg z-40 flex flex-col p-4">
+				<div className="fixed top-[25vh] left-0 w-64 h-fit bg-white shadow-lg rounded-r-lg z-40 flex flex-col p-4">
 					<ul className="space-y-2">
 						<li>
 							<button

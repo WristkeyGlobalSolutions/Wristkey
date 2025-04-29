@@ -5,8 +5,8 @@ import {
 	connectWalletViaExtention,
 	getWallets,
 	ALCgetTokens,
-} from "./api";
-import WalletNav from "@/components/ui/WalletNav";
+} from "@/app/dashboard/mining/managewallets/api";
+import WalletNav from "@/components/UI/WalletNav";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Alchemy, Network } from "alchemy-sdk";
@@ -110,17 +110,6 @@ const Portfolio = () => {
 			</div>
 			<div className="bg-gray-100 rounded-t-3xl p-2">
 				<WalletNav currentTab="portfolio"/>
-				<div className="connectWalletButton text-center">
-					{
-						<button
-						 onClick={() => router.push(`/dashboard/portfolio/wallet_connect`)}
-						 className="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
-						>
-							Connect Wallet
-						</button>
-					}
-				</div>
-
 				{/* White section content with a table below the buttons */}
 				<div className="transparent flex min-h-screen p-2 ml-60">
 					{/* Wallet  Choices */}
