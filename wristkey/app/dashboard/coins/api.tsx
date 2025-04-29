@@ -1,6 +1,6 @@
 "use client";
 import axios from "axios";
-import {Network, Alchemy, Nft, GetFloorPriceResponse, TokenAddressRequest, TokenMetadataResponse, TokenPriceByAddressResult, AssetTransfersCategory, AssetTransfersResponse, BaseNftCollection} from "alchemy-sdk";
+import {Network, Alchemy, Nft, GetFloorPriceResponse, TokenAddressRequest, TokenMetadataResponse, TokenPriceByAddressResult, AssetTransfersCategory, AssetTransfersResponse, BaseNftCollection, FloorPriceError} from "alchemy-sdk";
 import { useMemo } from "react";
 
 
@@ -343,27 +343,77 @@ export async function ALCsearch(alchemy : Alchemy, input : string) : Promise<Tok
     }
 }
 
-//Sorts through asset transfers and finds the trending tokens
-//Number is amount of transfers to look through
-export async function ALCgetTrendingTokens(alchemy : Alchemy, splice : number, count : number = 10, hours : number = 24) : Promise<[string, number][]>
-{
-    return await getTrending(alchemy, splice, [AssetTransfersCategory.ERC20], count, hours);
-}
-
-export async function ALCgetTrendingNFTs(alchemy : Alchemy, splice : number, count : number = 10, hours : number = 24) : Promise<[string, number][]>
-{
-    return await getTrending(alchemy, splice, [AssetTransfersCategory.ERC721, AssetTransfersCategory.ERC1155], count, hours);
-}
-
-
 //Be careful with how many hours you call our from! This can take a while
 //Try to get this on some backend and make it pingable
 
 //Count is amount per block, hour is how many blocks it should check from
 //Look into desk screeners || coin geckos --> switch back to coingecko
 
-const SAMPLE_COUNT = 20; // number of random samples
-const BLOCK_RANGE = 10; // how many blocks per sample
+export async function getTrendingTokenList(alchemy : Alchemy, splice : number, count : number = 1000, hours : number = 24)
+{
+    let tokens = await getTrending(alchemy, splice, [AssetTransfersCategory.ERC20], count, hours);
+
+    let ret : Token[] = [];
+
+    for(let pair of tokens)
+    {
+        let token = await TokenFromContract(alchemy, pair[0]);
+
+        //Checks in place to get valid tokens
+        if(!token)
+        {
+            continue;
+        }
+
+        //This value is the USD used to preview the price, we need it
+        if(!token.token_addresses || !token.token_addresses.prices[0])
+        {
+            continue;
+        }
+
+        ret.push(token);
+
+    }
+
+    return ret;
+}
+
+export async function getTrendingNFTList(alchemy : Alchemy, splice : number, count : number = 1000, hours : number = 24)
+{
+    let nfts = await getTrending(alchemy, splice, [AssetTransfersCategory.ERC721, AssetTransfersCategory.ERC1155], count, hours);
+
+    let ret : NFTCollection[] = [];
+
+    for(let pair of nfts)
+    {
+        let nft = await NFTFromContract(alchemy, pair[0]);
+
+        //Checks in place to get valid collections
+        if(!nft)
+        {
+            continue;
+        }
+
+        //This value is used for the floor pricing so make sure we have it
+        if(!nft.floor_pricing || ((nft.floor_pricing.openSea as FloorPriceError).error))
+        {
+            console.log((nft.floor_pricing.openSea as FloorPriceError).error);
+            continue;
+        }
+
+        if(!nft.contract_address)
+        {
+            continue;
+        }
+
+        ret.push(nft);
+    }
+
+    return ret;   
+}
+
+const SAMPLE_COUNT = 40; // number of random samples
+const BLOCK_RANGE = 20; // how many blocks per sample
 
 async function getTrending(alchemy : Alchemy, splice : number, category : AssetTransfersCategory[], count : number, hours : number)
 {
