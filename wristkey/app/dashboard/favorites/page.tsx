@@ -62,9 +62,9 @@ const Favorites = () => {
 
 	return (
 		<div className="bg-gradient-to-r from-blue-700 to-blue-950 h-screen">
-			<div className="mx-auto max-w-7xl p-6 shadow-md">
-				<h1 className="text-4xl text-center p-2">Favorites</h1>
 				<WalletNav currentTab="favorites" />
+			<div className="mx-auto max-w-7xl p-6 w-[90%] pl-[20%]">
+				<h1 className="text-4xl text-center p-2">Favorites</h1>
 				<div>
 					<p className="text-lg font-semibold">Trending NFTs:</p>
 					{favoriteNFTs ? (

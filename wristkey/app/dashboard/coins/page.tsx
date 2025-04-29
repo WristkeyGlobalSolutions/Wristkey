@@ -249,60 +249,7 @@ export default function Coins() {
 							)}
 						</div>
 					</div>
-					<div className="directory text-center space-x-4">
-						<Link
-							href="/staking"
-							className="text-blue-600 underline hover:text-blue-800"
-						>
-							Staking
-						</Link>
-						<Link
-							href="/security"
-							className="text-red-600 underline hover:text-red-800"
-						>
-							Security
-						</Link>
-						<Link
-							href="/auth"
-							className="text-green-600 underline hover:text-green-800"
-						>
-							Login
-						</Link>
-						<Link
-							href="/auth"
-							className="text-yellow-600 underline hover:text-yellow-800"
-						>
-							Register
-						</Link>
-					</div>
 				</div>
-			</div>
-
-			<div className="directory text-center space-x-4">
-				<Link
-					href="/staking"
-					className="text-blue-600 underline hover:text-blue-800"
-				>
-					Staking
-				</Link>
-				<Link
-					href="/security"
-					className="text-red-600 underline hover:text-red-800"
-				>
-					Security
-				</Link>
-				<Link
-					href="/auth"
-					className="text-green-600 underline hover:text-green-800"
-				>
-					Login
-				</Link>
-				<Link
-					href="/auth"
-					className="text-yellow-600 underline hover:text-yellow-800"
-				>
-					Register
-				</Link>
 			</div>
 		</div>
 	);

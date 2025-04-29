@@ -9,6 +9,7 @@ import {
 	getFavoritesForUser,
 	removeFavoriteFromUser,
 } from "@/lib/firestore";
+import WalletNav from "@/components/ui/WalletNav";
 
 const settings = {
 	apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
@@ -79,6 +80,7 @@ export default function AssetInfo() {
 
 	return (
 		<div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-700 to-blue-950">
+			<WalletNav currentTab="explore" />
 			<div className="w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden">
 				<div className="p-6 text-center">
 					<div className="mb-4">
