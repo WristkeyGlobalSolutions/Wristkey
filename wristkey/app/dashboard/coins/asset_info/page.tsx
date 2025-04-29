@@ -1,171 +1,154 @@
 "use client";
-import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import * as API from "../api";
 import { Alchemy, Network } from "alchemy-sdk";
 import { useAuth } from "@/context/AuthContext";
-import { addFavoriteToUser, getFavoritesForUser, removeFavoriteFromUser } from "@/lib/firestore";
+import {
+	addFavoriteToUser,
+	getFavoritesForUser,
+	removeFavoriteFromUser,
+} from "@/lib/firestore";
 
-const settings = 
-{
-    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-    network: Network.ETH_MAINNET,
+const settings = {
+	apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+	network: Network.ETH_MAINNET,
 };
 
-export default function AssetInfo() 
-{
-    const [nft, setNft] = useState<API.NFTCollection | undefined | null>(null);
-    const [token, setToken] = useState<API.Token | undefined | null>(null);
-    const[assetDescription, setAssetDescription] = useState<string | undefined | null>(null);
-    const[assetAddress, setAssetAddress] = useState<string | undefined | null>(null);
+export default function AssetInfo() {
+	const [nft, setNft] = useState<API.NFTCollection | undefined | null>(null);
+	const [token, setToken] = useState<API.Token | undefined | null>(null);
+	const [assetDescription, setAssetDescription] = useState<
+		string | undefined | null
+	>(null);
+	const [assetAddress, setAssetAddress] = useState<string | undefined | null>(
+		null
+	);
+	const [favorited, setFavorited] = useState<boolean>(false);
 
-    const { user, logout, loading } = useAuth();
-    const type = useSearchParams().get('type');
-    const address = useSearchParams().get('address');
+	const { user } = useAuth();
+	const type = useSearchParams().get("type");
+	const address = useSearchParams().get("address");
 
-    async function favoriteAsset()
-    {
-        if(user && assetAddress)
-        {
-            let favorites = await getFavoritesForUser(user);
-        
-            if(!favorites.includes(assetAddress))
-            {
-                addFavoriteToUser(user, assetAddress);
-            }
-            else
-            {
-                removeFavoriteFromUser(user, assetAddress);
-            }
-        }
+	const favoriteAsset = async () => {
+		if (user && assetAddress && type) {
+			const prevState = favorited;
+			setFavorited(!prevState);
+			const favorites = await getFavoritesForUser(user);
+			if (!favorites.map((f) => f.address).includes(assetAddress)) {
+				addFavoriteToUser(user, assetAddress, type);
+			} else {
+				removeFavoriteFromUser(user, assetAddress);
+			}
+		}
+	};
 
-    }
+	useEffect(() => {
+		const fetchAsset = async (
+			address: string | null,
+			type: string | null
+		) => {
+			if (address && user && type) {
+				let asset: API.NFTCollection | API.Token | undefined;
+				if (type == "nft") {
+					try {
+						asset = await API.NFTFromContract(alchemy, address);
+						setNft(asset);
+						setAssetAddress(asset?.contract_address);
+					} catch (e) {}
+				} else if (type == "token") {
+					try {
+						asset = await API.TokenFromContract(alchemy, address);
+						setToken(asset);
+						setAssetAddress(asset?.token_addresses.address);
+					} catch (e) {}
+				}
+				const favorites = await getFavoritesForUser(user);
+				if (favorites.map((f) => f.address).includes(address)) {
+					setFavorited(true);
+				}
+			} else {
+				setToken(null);
+				setNft(null);
+			}
+		};
 
-    useEffect(() => {
-        const fetchAsset = async(address : string | null, type : string | null) =>
-        {
-            if(address)
-            {
-                
-                let asset : API.NFTCollection | API.Token | undefined;
-                if(type == "nft")
-                {
-                    try
-                    {
-                        asset = await API.NFTFromContract(alchemy, address);
-                        setNft(asset);
-                        setAssetAddress(asset?.contract_address);
-                    }
-                    catch(e)
-                    {
+		const alchemy = new Alchemy(settings);
+		fetchAsset(address, type);
+	}, [user, address, type]);
 
-                    }
-                }
-        
-                else if(type == "token")
-                {
-                    try
-                    {
-                        asset = await API.TokenFromContract(alchemy, address);
-                        setToken(asset);
-                        setAssetAddress(asset?.token_addresses.address);
-                    }
-                    catch(e)
-                    {
+	return (
+		<div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-700 to-blue-950">
+			<div className="w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden">
+				<div className="p-6 text-center">
+					<div className="mb-4">
+						{!nft && !token && (
+							<div>
+								<p className="text-gray-500">No Asset</p>
+							</div>
+						)}
 
-                    }
-                }
-            }
-            else
-            {
-                setToken(null);
-                setNft(null);
-            }
-        }
+						{nft && (
+							<div>
+								<p className="text-xl font-semibold text-gray-800">
+									{nft.nfts[0].collection?.name}
+								</p>
+								<div className="mt-4">
+									<img
+										src={
+											nft.nfts[0].collection
+												?.bannerImageUrl as "image"
+										}
+										alt={`${nft.nfts[0].collection?.name} Image`}
+										className="mx-auto rounded-md"
+									/>
+								</div>
+							</div>
+						)}
 
-        const alchemy = new Alchemy(settings);
+						{token && (
+							<div>
+								<p className="text-xl font-semibold text-gray-800">
+									{token.metadata.name}
+								</p>
+								<div className="mt-4">
+									<img
+										src={token.metadata.logo as "image"}
+										alt={`${token.metadata.name} Image`}
+										className="mx-auto rounded-md"
+									/>
+								</div>
+							</div>
+						)}
+					</div>
 
-        fetchAsset(address, type);
-    }, []);
+					<button
+						onClick={favoriteAsset}
+						className={`w-10 h-10 flex justify-center items-center rounded-full shadow transition ${
+							favorited
+								? "bg-red-500 text-white hover:bg-red-600"
+								: "bg-gray-300 text-gray-700 hover:bg-gray-400"
+						}`}
+						aria-label="Favorite"
+					>
+						{favorited ? "♥" : "♡"}
+					</button>
 
-    return(
+					<div className="mt-6">
+						{!assetDescription && (
+							<p className="text-gray-500">No Description</p>
+						)}
 
-        <div className="bg-gradient-to-r from-blue-700 to-blue-950 w-full">
-            <div className="bg-gray-100 rounded-t-3xl min-h-screen w-full text-center">
-
-                <div className="assetTitle">
-                    {!nft && !token &&
-                    <div>
-                        <p>No Asset</p>
-                    </div>
-                    }
-
-                    {nft &&
-                    <div>
-                        <p>
-                            {nft.nfts[0].collection?.name}
-                        </p>
-
-                        <br></br>
-
-                        <img
-                            src={nft.nfts[0].collection?.bannerImageUrl as "image"}
-                            alt={`${name} Image`}
-                            width={50}
-                            height={50}
-                            className="mx-auto"
-                        />
-
-                    </div>    
-                    }
-
-                    {token &&
-                    <div>
-                        <p>
-                            {token.metadata.name}
-                        </p>
-
-                        <br></br>
-
-                        <img
-                            src={token.metadata.logo as "image"}
-                            alt={`${name} Image`}
-                            width={50}
-                            height={50}
-                            className="mx-auto"
-                        />
-
-                    </div>    
-                    }
-                </div>
-
-
-                <br></br>
-
-                <button
-                    onClick={() => favoriteAsset}
-                    className="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
-                >
-                    Favorite
-                </button>
-
-                <div className="Description">
-                    {!assetDescription &&
-                        <p>No Description</p>
-                    }
-
-
-                    {assetDescription &&
-                    <div>
-                        <p>
-                            {assetDescription}
-                        </p>
-                    </div>
-                    }   
-                </div>
-
-            </div>
-        </div>
-    )
+						{assetDescription && (
+							<div>
+								<p className="text-gray-700">
+									{assetDescription}
+								</p>
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }

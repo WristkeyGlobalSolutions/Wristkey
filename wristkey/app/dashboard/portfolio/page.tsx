@@ -6,7 +6,7 @@ import {
 	getWallets,
 	ALCgetTokens,
 } from "./api";
-import WalletNav from "@/components/UI/WalletNav";
+import WalletNav from "@/components/ui/WalletNav";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Alchemy, Network } from "alchemy-sdk";
@@ -109,7 +109,7 @@ const Portfolio = () => {
 				</h1>
 			</div>
 			<div className="bg-gray-100 rounded-t-3xl p-2">
-				<WalletNav />
+				<WalletNav currentTab="portfolio"/>
 				<div className="connectWalletButton text-center">
 					{
 						<button

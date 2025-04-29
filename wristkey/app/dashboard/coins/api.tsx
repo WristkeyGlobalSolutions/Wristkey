@@ -253,8 +253,8 @@ export type NFTCollection =
 //Gets a token given a contract
 export async function TokenFromContract(alchemy : Alchemy, address : string) : Promise<Token | undefined>
 {
-    var token_metadata;
-    var token_pricing;
+    let token_metadata;
+    let token_pricing;
 
     try
     {
@@ -289,8 +289,8 @@ export async function TokenFromContract(alchemy : Alchemy, address : string) : P
 
 export async function NFTFromContract(alchemy : Alchemy, address : string) : Promise<NFTCollection | undefined>
 {
-    var nfts;
-    var floor_pricing;
+    let nfts;
+    let floor_pricing;
 
     try
     {

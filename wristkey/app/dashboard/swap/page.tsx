@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import WalletNav from "@/components/UI/WalletNav";
-import Dropdown from "@/components/UI/Dropdown";
+import WalletNav from "@/components/ui/WalletNav";
+import Dropdown from "@/components/ui/Dropdown";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
@@ -70,10 +70,10 @@ const Swap = () => {
   };
 
   return (
-  <div className="bg-gradient-to-r from-blue-700 to-blue-950">
+	  <div className="bg-gradient-to-r from-blue-700 to-blue-950">
+		  <WalletNav currentTab='swap'/>
     <div className="bg-gray-100 min-h-screen rounded-t-3xl p-2">
         <h1 className="text-4xl text-center p-2">Swap</h1>
-        <WalletNav />
         <div className="transparent rounded-3xl p-4 space-y-4 max-w-md mx-auto">
             {/* Top Box (changes with swap) */}
             <p>Pay with: </p>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import WalletNav from "@/components/UI/WalletNav";
+import WalletNav from "@/components/ui/WalletNav";
 import WalletCard from "@/components/walletCard";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -47,7 +47,7 @@ const ManageWallets = () => {
 					</button>
 					<h1 className="text-4xl">Manage Wallets</h1>
 				</div>
-				<WalletNav />
+				<WalletNav currentTab="mining"/>
 
 				<div className="ml-72 mt-8">
 					<h1 className="text-black text-xl">My Wallets:</h1>
