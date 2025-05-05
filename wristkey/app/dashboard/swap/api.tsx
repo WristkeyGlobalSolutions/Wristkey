@@ -32,8 +32,7 @@ const alchemy = new Alchemy(settings);
 const provider = new ethers.JsonRpcProvider((await alchemy.config.getProvider()).connection.url);
 
 export async function getAlchemySwapQuote(
-params: SwapParams,
-alchemyApiKey: string
+params: SwapParams
 ): Promise<SwapQuoteResult> 
 {
     try {
@@ -84,8 +83,7 @@ export async function checkTokenAllowance(
     tokenAddress: string,
     ownerAddress: string,
     spenderAddress: string,
-    amount: string,
-    alchemyApiKey: string
+    amount: string
   ): Promise<boolean> 
 {
     try 
@@ -117,8 +115,7 @@ export async function checkAllowanceViaAlchemyCore(
     tokenAddress: string,
     ownerAddress: string,
     spenderAddress: string,
-    amount: string,
-    alchemyApiKey: string
+    amount: string
   ): Promise<boolean> 
 {
     try{
@@ -164,14 +161,13 @@ export function generateApprovalData(
 }
 
 export async function executeAlchemySwap(
-    params: SwapParams,
-    alchemyApiKey: string
+    params: SwapParams
   ): Promise<{ success: boolean; transactionHash?: string; error?: string }> 
 {
     try 
     {
         // Get the quote first
-        const quote = await getAlchemySwapQuote(params, alchemyApiKey);
+        const quote = await getAlchemySwapQuote(params);
         
         // For frontend execution, connect to the user's wallet
         if (typeof window === 'undefined' || !window.ethereum) 
@@ -196,7 +192,6 @@ export async function executeAlchemySwap(
             userAddress,
             quote.tx.to,
             params.amount,
-            alchemyApiKey
             );
             
             if(!isApproved) 
@@ -244,8 +239,7 @@ export async function executeAlchemySwap(
 }
 
 export async function getSwapQuoteReadOnly(
-    params: SwapParams,
-    alchemyApiKey: string
+    params: SwapParams
   ): Promise<{
     quote: SwapQuoteResult;
     readableQuote: {
@@ -260,7 +254,7 @@ export async function getSwapQuoteReadOnly(
     try 
     {
         // Get the quote
-        const quote = await getAlchemySwapQuote(params, alchemyApiKey);
+        const quote = await getAlchemySwapQuote(params);
         
         // Add some readable information
         const readableQuote = {

@@ -1,16 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-	getContract,
-	connectWalletViaExtention,
-	getWallets,
-	ALCgetTokens,
-} from "@/app/dashboard/mining/managewallets/api";
+import {useWallets} from "@/app/dashboard/mining/managewallets/api";
 import WalletNav from "@/components/UI/WalletNav";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Alchemy, Network } from "alchemy-sdk";
 import { Token } from "../coins/api";
+import { asset, get_wallet_data } from "./api";
 
 const settings = {
 	apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
@@ -24,68 +20,22 @@ const Portfolio = () => {
 		null
 	);
 
+    const{wallets, refreshWallets} = useWallets();
+
 	const handleClick = (page: "mywallet" | "nfts") => {
 		setActiveTab(page);
 	};
 
-	type asset = {
-		balance: string | undefined;
-		value: number;
-		change: number;
-		percentage: string;
-	};
-
 	useEffect(() => {
-		async function connectWallets() {
-			if (user) {
-				let wallets = await getWallets(user);
-				let wallet_data: Map<string, [Token, string][]> = new Map();
-				let token_data: Map<Token, string> = new Map();
-
-				const assetMap = new Map<string, asset>();
-
-				if (wallets) {
-					for (let i = 0; i < wallets.length; i++) {
-						let tokens = await ALCgetTokens(alchemy, wallets[i]);
-						wallet_data.set(wallets[i], tokens);
-
-						//Get the total for this token's amount
-						tokens.forEach((data: [Token, string]) => {
-							if (token_data.has(data[0])) {
-								token_data.set(
-									data[0],
-									`${
-										parseFloat(
-											token_data.get(data[0]) as string
-										) + parseFloat(data[1] as string)
-									}`
-								);
-							} else {
-								token_data.set(data[0], data[1]);
-							}
-						});
-					}
-				}
-
-				let keys = token_data.keys().toArray();
-				for (let i = 0; i < token_data.size; i++) {
-					assetMap.set(keys[i].metadata.name ?? "N/A", {
-						balance: token_data.get(keys[i]),
-						value:
-							parseFloat(
-								keys[i].token_addresses.prices[0]?.value
-							) * parseFloat(token_data.get(keys[i]) ?? "0"),
-						change: 0,
-						percentage: "0%",
-					});
-				}
-				updateWalletData(assetMap);
-			}
+		async function connectWallets() 
+        {	
+			updateWalletData(await get_wallet_data(user, alchemy, wallets));
 		}
 
 		const alchemy = new Alchemy(settings);
 		connectWallets();
-	}, [user]);
+
+    }, [wallets]);
 
 	const router = useRouter();
 
@@ -259,64 +209,5 @@ const Portfolio = () => {
 		</div>
 	);
 };
-
-/**
-<tr>
-                        <td className="py-2 px-4 border-b">Bitcoin</td>
-                        <td className="py-2 px-4 border-b text-right">0.0</td>
-                        <td className="py-2 px-4 border-b text-right">0%</td>
-                        <td className="py-2 px-4 border-b text-right">$18.00</td>
-                        <td className="py-2 px-4 border-b text-right">0</td>
-                    </tr>
-                    <tr>
-                        <td className="py-2 px-4 border-b">Ethereum</td>
-                        <td className="py-2 px-4 border-b text-right">0.0</td>
-                        <td className="py-2 px-4 border-b text-right">0%</td>
-                        <td className="py-2 px-4 border-b text-right">$20.00</td>
-                        <td className="py-2 px-4 border-b text-right">0</td>
-                    </tr>
-                    <tr>
-                        <td className="py-2 px-4 border-b">USDT</td>
-                        <td className="py-2 px-4 border-b text-right">0.0</td>
-                        <td className="py-2 px-4 border-b text-right">0%</td>
-                        <td className="py-2 px-4 border-b text-right">$5.00</td>
-                        <td className="py-2 px-4 border-b text-right">0</td>
-                    </tr>
-                    <tr>
-                        <td className="py-2 px-4 border-b">Avax</td>
-                        <td className="py-2 px-4 border-b text-right">0.0</td>
-                        <td className="py-2 px-4 border-b text-right">0%</td>
-                        <td className="py-2 px-4 border-b text-right">$5.00</td>
-                        <td className="py-2 px-4 border-b text-right">0</td>
-                    </tr>
-                    <tr>
-                        <td className="py-2 px-4 border-b">Aptos</td>
-                        <td className="py-2 px-4 border-b text-right">0.0</td>
-                        <td className="py-2 px-4 border-b text-right">0%</td>
-                        <td className="py-2 px-4 border-b text-right">$5.00</td>
-                        <td className="py-2 px-4 border-b text-right">0</td>
-                    </tr>
-                    <tr>
-                        <td className="py-2 px-4 border-b">Agoric</td>
-                        <td className="py-2 px-4 border-b text-right">0.0</td>
-                        <td className="py-2 px-4 border-b text-right">0%</td>
-                        <td className="py-2 px-4 border-b text-right">$5.00</td>
-                        <td className="py-2 px-4 border-b text-right">0</td>
-                    </tr>
-                    <tr>
-                        <td className="py-2 px-4 border-b">Filecoin</td>
-                        <td className="py-2 px-4 border-b text-right">0.0</td>
-                        <td className="py-2 px-4 border-b text-right">0%</td>
-                        <td className="py-2 px-4 border-b text-right">$5.00</td>
-                        <td className="py-2 px-4 border-b text-right">0</td>
-                    </tr>
-                    <tr>
-                        <td className="py-2 px-4 border-b">BNB</td>
-                        <td className="py-2 px-4 border-b text-right">0.0</td>
-                        <td className="py-2 px-4 border-b text-right">0%</td>
-                        <td className="py-2 px-4 border-b text-right">$5.00</td>
-                        <td className="py-2 px-4 border-b text-right">0</td>
-                    </tr>
- */
 
 export default Portfolio;

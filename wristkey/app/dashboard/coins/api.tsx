@@ -1,142 +1,70 @@
 "use client";
 import axios from "axios";
 import {Network, Alchemy, Nft, GetFloorPriceResponse, TokenAddressRequest, TokenMetadataResponse, TokenPriceByAddressResult, AssetTransfersCategory, AssetTransfersResponse, BaseNftCollection, FloorPriceError} from "alchemy-sdk";
-import { useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ALCgetTokens } from "../mining/managewallets/api";
 
+const settings = {
+	apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+	network: Network.ETH_MAINNET,
+};
 
-
-
-/*
-//Documentation: https://docs.coingecko.com/reference/trending-search
-export type PreviewTokenObject = 
+type TrendingData = 
 {
-    id: string;
-    name: string;
-    symbol: string; //Currency symbol
-    image_thumb: string; //Icon for this Token
-    image_large: string;
+    trending_tokens: Token[] | null;
+    trending_nfts: NFTCollection[] | null;
+};
 
-    price_btc : number;
-    price_usd : number;
-}
 
-export type PreviewNFTObject = 
-{
-    id: string;
-    name: string;
-    symbol: string;
-    image_thumb: string;
-    native_currency_symbol: string;
-    h24_volume : string;
+//Optimized trending to now be a once go on run!!
+const trendingContext = createContext<TrendingData | undefined>(undefined);
 
-    floor_price_in_native_currency : number;
-}
+export const TrendingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const fetched = useRef(false);
+    const [trending_tokens, setTokens] = useState<Token[] | null>(null);
+    const [trending_nfts, setNFTs] = useState<NFTCollection[] | null>(null);
 
-export type DetailedTokenObject = 
-{
-    id : string;
-    name : string;
-    symbol : string; //Currency symbol
-    image_large : string;
-    image_small : string;
-    image_thumb : string;
-    description : string;
-
-    prices : {[currency_code: string]: number}; //list of prices given a 3-character currency coe (ex: usd)
-}
-
-export type DetailedNFTObject =
-{
-    id : string;
-    contract_address : string;
-    name : string;
-    symbol : string;
-    image_small : string;
-    image_banner : string;
-    description : string;
-    native_currency : string;
-    native_currency_symbol : string;
-
-    floor_price : {[currency_type : string]: number}; //currency type is either 'native_currency' or 'usd'
-}
-
-export type GeckoSearchQuery =
-{
-    nfts: PreviewNFTObject[];
-    tokens: PreviewTokenObject[];
-}
-*/
-
-/*
-export async function getNFT(id : string) : Promise<DetailedNFTObject | null>
-{
-    try 
+    useEffect(() => 
     {
-        const response = await axios.get(process.env.NEXT_PUBLIC_COINGECKO_URL + 'nfts/' + id);
-        let nft = response.data;
+        if (fetched.current) return;
+        fetched.current = true;
 
-        let ret : DetailedNFTObject =
+        const fetchTrendingData = async () => 
         {
-            id: nft.id,
-            contract_address: nft.contract_address,
-            name: nft.name,
-            symbol: nft.symbol,
-            image_small: nft.image.small,
-            image_banner: nft.banner_image,
-            description: nft.description,
-            native_currency: nft.native_currency,
-            native_currency_symbol: nft.native_currency_symbol,
-            
-            floor_price : nft.floor_price
+            try 
+            {
+                const [tokenData, nftData] = await Promise.all([
+                    getTrendingTokenList(alchemy, 10),
+                    getTrendingNFTList(alchemy, 5),
+                ]);
+
+                setTokens(tokenData);
+                setNFTs(nftData);
+            } 
+            catch(error) 
+            {
+                console.error("Failed to fetch trending data:", error);
+            }
         }
 
-        return ret;
-    }
-    catch(error)
-    {
-        console.error("Error find NFT:", error);
-        return null;    
-    }   
-}
-*/
+        let alchemy = new Alchemy(settings);
 
-/*
-export async function getToken(id : string) : Promise<DetailedTokenObject | null>
+        fetchTrendingData();
+        }, []);
+
+    return (
+    <trendingContext.Provider value={{ trending_tokens: trending_tokens, trending_nfts: trending_nfts }}>
+        {children}
+    </trendingContext.Provider>
+    );
+};
+
+export const useTrending = () => 
 {
-    try 
-    {
-        const options = 
-        {
-            method: 'GET',
-            url: process.env.NEXT_PUBLIC_COINGECKO_URL + 'coins/' + id,
-            headers: {accept: 'application/json'}
-        };
-
-        let response = await axios.request(options);
-        let coin = response.data;
-        console.log(coin);
-
-        let ret : DetailedTokenObject =
-        {
-            id: coin.id,
-            name: coin.name,
-            symbol: coin.symbol,
-            image_thumb: coin.image.thumb,
-            image_large: coin.image.large,
-            image_small: coin.image.small,
-            prices: coin.market_data.current_price,
-            description : coin.description.en
-        }
-
-        return ret;
-    }
-    catch(error)
-    {
-        console.error("Error finding Token:", error);
-        return null;    
-    }  
-}
-*/
+    const context = useContext(trendingContext);
+    if (!context) throw new Error("useTrending must be used within a TrendingProvider");
+    return context;
+};
 
 //Gets a list of the top 10 trending Tokens
 export async function getTrendingTokens(): Promise<Token[]> 
@@ -269,6 +197,17 @@ export async function TokenFromContract(alchemy : Alchemy, address : string) : P
     {
         token_pricing = (await alchemy.prices.getTokenPriceByAddress(
         [{network: Network.ETH_MAINNET, address: address}])).data[0];
+        
+        //TODO : UNCOMMENT THIS!!!!!!!!!!!!!!!!
+        //placeholder as this call has limits
+        /*
+        token_pricing = {    
+            network: "network test",
+            address: "address placeholder",
+            prices: [],
+            error: null
+        };
+        */
     }
     catch(error)
     {
@@ -365,6 +304,7 @@ export async function getTrendingTokenList(alchemy : Alchemy, splice : number, c
             continue;
         }
 
+        //TODO: UNCOMMENT THIS WHEN YOU WENT RELIABLE DATA
         //This value is the USD used to preview the price, we need it
         if(!token.token_addresses || !token.token_addresses.prices[0])
         {
@@ -397,7 +337,6 @@ export async function getTrendingNFTList(alchemy : Alchemy, splice : number, cou
         //This value is used for the floor pricing so make sure we have it
         if(!nft.floor_pricing || ((nft.floor_pricing.openSea as FloorPriceError).error))
         {
-            console.log((nft.floor_pricing.openSea as FloorPriceError).error);
             continue;
         }
 
@@ -412,8 +351,8 @@ export async function getTrendingNFTList(alchemy : Alchemy, splice : number, cou
     return ret;   
 }
 
-const SAMPLE_COUNT = 40; // number of random samples
-const BLOCK_RANGE = 20; // how many blocks per sample
+const SAMPLE_COUNT = 20; // number of random samples
+const BLOCK_RANGE = 10; // how many blocks per sample
 
 async function getTrending(alchemy : Alchemy, splice : number, category : AssetTransfersCategory[], count : number, hours : number)
 {

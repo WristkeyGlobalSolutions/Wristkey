@@ -1,13 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext"; // Adjust the path as needed
 import { useRouter } from "next/navigation";
+import { Alchemy, Network } from "alchemy-sdk";
+import { asset, get_wallet_data } from "@/app/dashboard/portfolio/api";
+import { useWallets } from "@/app/dashboard/mining/managewallets/api";
 
-const Dropdown: React.FC = () => {
-	const { user, logout } = useAuth();
-	const router = useRouter();
+const settings = {
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+    network: Network.ETH_MAINNET,
+};
 
-	const [isOpen, setIsOpen] = useState(false); // State to toggle the dropdown
-	const [selectedCoin, setSelectedCoin] = useState("Coin");
+let alchemy : Alchemy;
+
+interface DropdownProps 
+{
+    //This for some reason resets the prop
+    onSelect: (selectedAddress: string, selectedAsset: asset) => void;
+}
+
+const Dropdown: React.FC<DropdownProps> = ({onSelect}) => {
+
+    const {wallets, refreshWallets} = useWallets();
+    const { user, logout } = useAuth();
+    const router = useRouter();
+
+    const[dropdownProperties, setdropdownProperties] = useState<Map<string, asset> | null>(null);
+    const [isOpen, setIsOpen] = useState(false); // State to toggle the dropdown
+    const [selectedCoin, setSelectedCoin] = useState("(Select coin)");
 
 	// Function to toggle the dropdown visibility
 	const toggleDropdown = () => {
@@ -31,13 +50,31 @@ const Dropdown: React.FC = () => {
 			}
 		};
 
+        //Sets the dropdown to only show the tokens the user has
+        async function set_tokens()
+        {
+            let tokens = await get_wallet_data(user, alchemy, wallets);
+
+            //Populate the assets we know the user has
+            if(tokens)
+            {
+                setdropdownProperties(tokens);
+            }
+        }
+
+        alchemy = new Alchemy(settings);
+
+        set_tokens();
+
 		document.addEventListener("click", handleClickOutside);
 		return () => document.removeEventListener("click", handleClickOutside);
 	}, []);
 
-	const handleItemClick = (name: string) => {
+	const handleItemClick = (name: string, asset : asset) => {
+        //this is currently broken
 		setSelectedCoin(name);   // Update button text
 		setIsOpen(false);        // Close dropdown
+        onSelect(name, asset);
 	};
 
 	return (
@@ -53,13 +90,13 @@ const Dropdown: React.FC = () => {
 			{isOpen && (
 				<div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 shadow-lg z-10">
 					<ul className="py-2">
-						{["Bitcoin", "Ethereum", "Solana", "Dogecoin", "Avax"].map((coin) => (
-							<li key={coin}>
+                        {dropdownProperties && Array.from(dropdownProperties.entries()).map(([name, asset]) => (
+							<li key={name}>
 								<span
-									onClick={() => handleItemClick(coin)}
+									onClick={() => handleItemClick(name, asset)}
 									className="block px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer"
 								>
-									{coin}
+									{name}
 								</span>
 							</li>
 						))}

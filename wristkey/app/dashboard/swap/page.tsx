@@ -1,39 +1,63 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import WalletNav from "@/components/ui/WalletNav";
-import Dropdown from "@/components/ui/Dropdown";
+import WalletNav from "@/components/UI/WalletNav";
+import Dropdown from "@/components/UI/Dropdown";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { asset } from '../portfolio/api';
 
 
 const Swap = () => {
 
- const { user, refreshUser } = useAuth();
- const [amount, setAmount] = useState("0.0");
- const [isSwapped, setIsSwapped] = useState(false);
- const [message, setMessage] = useState("");
- const balance = 1.5;
+    const { user, refreshUser } = useAuth();
+    const [amount, setAmount] = useState(0);
+    const [balance, setBalance] = useState(0);
+    const [isSwapped, setIsSwapped] = useState(false);
+    const [message, setMessage] = useState("");
 
- const parse = (val: string) => {
-   const num = parseFloat(val);
-   return isNaN(num) ? 0 : num;
- };
+    const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+    const [selectedAsset, setSelectedAsset] = useState<asset | null>(null);
 
- const handleChange = (val: string, isMain: boolean) => {
-   if (val === "") {
-     setAmount("");
-     return;
-   }
+    const handleDropdownSelect = (address: string, asset: asset) => 
+    {
+        setSelectedAddress(address);
+        setSelectedAsset(asset);
+    }
 
-   const num = parse(val);
-   const updated = isMain ? num : num * 2;
+    const parse = (val: string) => 
+    {
+        const num = parseFloat(val);
+        return isNaN(num) ? 0 : num;
+    };
 
-   if (updated <= balance) {
-     setAmount(updated.toString());
-   }
- };
+//This needs to properly display the updated token max amount
+    const handleChange = (val: string, isMain: boolean) => 
+    {
+        if (val === "") 
+        {
+            setAmount(0);
+            return;
+        }
 
- const mainValue = parseFloat(amount) || 0;
+        if(selectedAsset && selectedAsset.balance)
+        {
+            setBalance(parseFloat(selectedAsset.balance));
+        }
+        else
+        {
+            setBalance(0);
+        }
+
+        const num = parse(val);
+        const updated = isMain ? num : num * 2;
+
+        if (updated <= balance) 
+        {
+            setAmount(updated);
+        }
+    };
+
+ const mainValue = amount || 0;
  const secondaryValue = isSwapped ? mainValue * 2 : mainValue / 2;
 
  // Shared box UI
@@ -51,7 +75,7 @@ const Swap = () => {
     <div className="bg-white border-2 border-gray-300 rounded-2xl h-20 px-4 py-2 flex items-center justify-between">
       <div>
         {/* Dynamically switch dropdown options based on isSwapped */}
-        <Dropdown />
+        <Dropdown onSelect={handleDropdownSelect}/>
         <p className="text-sm text-gray-500 mt-1">Balance: {balance}</p>
       </div>
       <input
@@ -79,14 +103,14 @@ const Swap = () => {
             <p>Pay with: </p>
             {!isSwapped ? (
                 <Box
-                value={amount}
+                value={amount.toString()}
                 onChange={(e) => handleChange(e.target.value, true)}
                 balance={balance}
                 isMainBox={true}
                 />
             ) : (
                 <Box
-                value={(parseFloat(amount) / 2).toString()}
+                value={(amount / 2).toString()}
                 onChange={(e) => handleChange(e.target.value, false)}
                 balance={balance}
                 isMainBox={false}
@@ -107,14 +131,14 @@ const Swap = () => {
             <p>Recieve: </p>
             {isSwapped ? (
                 <Box
-                value={amount}
+                value={amount.toString()}
                 onChange={(e) => handleChange(e.target.value, true)}
                 balance={balance}
                 isMainBox={true}
                 />
             ) : (
                 <Box
-                value={(parseFloat(amount) / 2).toString()}
+                value={(amount / 2).toString()}
                 onChange={(e) => handleChange(e.target.value, false)}
                 balance={balance}
                 isMainBox={false}

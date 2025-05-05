@@ -10,12 +10,12 @@ import * as wallet from "./api";
 import { connectNetwork } from "@/utils/network";
 
 const ManageWallets = () => {
+    const {wallets, refreshWallets} = wallet.useWallets();
 	const { user } = useAuth();
 	const router = useRouter();
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [newWalletAddress, setNewWalletAddress] = useState<string | null>(null);
 	const [showPopup, setShowPopup] = useState(false);
-	const [wallets, setWallets] = useState<Wallet[]>([]);
 
 	const handleClick = (id: string) => {
 		setActiveId(id);
@@ -62,16 +62,6 @@ const ManageWallets = () => {
 		console.log("User in ManageWallets:", user);
 		connectNetwork();
 		if (!user) return;
-		const fetchWallets = async () => {
-			try {
-				const response = await getWalletsFromUser(user); // Adjust the API endpoint as needed
-				console.log("Fetched wallets:", response);
-				setWallets(response); // Assuming the API returns an array of wallet addresses
-			} catch (error) {
-				console.error("Error fetching wallets:", error);
-			}
-		};
-		fetchWallets();
 	}, [user]);
 
 	if (!user) {
@@ -138,13 +128,14 @@ const ManageWallets = () => {
 				<WalletNav currentTab="mining"/>
 				<div className="ml-72 mt-8 w-5/6">
 					<h1 className="text-black text-xl">My Wallets:</h1>
-					{wallets.map((wallet) => (
+					{wallets && wallets.map((wallet) => (
 						<div
 							key={wallet.address}
 							className="bg-white p-4 w-2/3 mt-4 border rounded-2xl shadow hover:shadow-lg"
 							onClick={() => handleClick(wallet.address)}
 						>
 							<WalletCard
+                                key={wallet.address}
 								wallet={wallet}
 								active={activeId === wallet.address}
 							/>

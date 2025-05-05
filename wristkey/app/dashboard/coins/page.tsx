@@ -4,7 +4,7 @@ import Link from "next/link";
 import * as network from "@/utils/network";
 import * as API from "./api";
 import CoinCard from "@/components/coinCard";
-import WalletNav from "@/components/ui/WalletNav";
+import WalletNav from "@/components/UI/WalletNav";
 import { Alchemy, FloorPriceMarketplace, Network } from "alchemy-sdk";
 
 let alchemy: Alchemy;
@@ -15,13 +15,9 @@ const settings = {
 };
 
 export default function Coins() {
+    const {trending_tokens, trending_nfts} = API.useTrending();
 	const [networkid, setNetworkID] = useState<string | null>(null);
-	const [trending_tokens, setTrendingTokens] = useState<API.Token[] | null>(
-		null
-	);
-	const [trending_nfts, setTrendingNFTs] = useState<
-		API.NFTCollection[] | null
-	>(null);
+
 	const [searchNFT, setSearchNFT] = useState<
 		API.NFTCollection | undefined | null
 	>(null);
@@ -40,8 +36,6 @@ export default function Coins() {
 			).value;
 			const token = await API.TokenFromContract(alchemy, input);
 			const collection = await API.NFTFromContract(alchemy, input);
-
-			console.log(input);
 
 			if (token) {
 				setSearchToken(token);
@@ -66,25 +60,6 @@ export default function Coins() {
 		alchemy = new Alchemy(settings);
 		fetchNetwork();
 	}, []);
-
-	useEffect(() => {
-		const fetchNFTs = async () => {
-			if (alchemy) {
-				setTrendingNFTs(await API.getTrendingNFTList(alchemy, 5));
-			}
-		};
-
-		fetchNFTs();
-	}, [alchemy]);
-
-	useEffect(() => {
-		const fetchTokens = async () => {
-			if (alchemy) {
-				setTrendingTokens(await API.getTrendingTokenList(alchemy, 10));
-			}
-		};
-		fetchTokens();
-	}, [alchemy]);
 
 	return (
 		<div className="bg-gradient-to-r from-blue-700 to-blue-950">
@@ -132,7 +107,7 @@ export default function Coins() {
 										address={
 											searchToken.token_addresses.address
 										}
-										//TODO: This can error has some tokens will not have a value defined for USD!!
+										//Some tokens don't have a value for usd [0]
 										price={
 											searchToken.token_addresses
 												.prices[0]
@@ -190,7 +165,7 @@ export default function Coins() {
 											address={
 												token.token_addresses.address
 											}
-											//TODO: This can error has some tokens will not have a value defined for USD!!
+											//Some tokens don't have a value for usd [0]
 											price={
 												token.token_addresses.prices[0]
 													? `${token.token_addresses.prices[0].value}${token.token_addresses.prices[0].currency}

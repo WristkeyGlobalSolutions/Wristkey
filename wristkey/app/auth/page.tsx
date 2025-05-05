@@ -10,7 +10,7 @@ import {
 	MultiFactorResolver,
 } from "firebase/auth";
 import TotpSignIn from "@/components/auth/totp-signin";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/UI/button";
 import OAuthButton from "@/components/auth/oAuth-button";
 
 export default function Register() {

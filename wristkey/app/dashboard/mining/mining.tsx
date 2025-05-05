@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import WalletNav from "@/components/ui/WalletNav";
+import WalletNav from "@/components/UI/WalletNav";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 

@@ -9,7 +9,7 @@ import {
 	getFavoritesForUser,
 	removeFavoriteFromUser,
 } from "@/lib/firestore";
-import WalletNav from "@/components/ui/WalletNav";
+import WalletNav from "@/components/UI/WalletNav";
 
 const settings = {
 	apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,

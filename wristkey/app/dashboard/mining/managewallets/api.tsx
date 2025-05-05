@@ -1,3 +1,4 @@
+"use client"
 import { ethers, Wallet } from "ethers";
 import { provider, ETHERSCAN_URL } from "@/utils/network";
 import {
@@ -5,10 +6,69 @@ import {
     getWalletsFromUser,
     removeWalletFromUser,
 } from "@/lib/firestore";
-import { FirestoreUser } from "@/context/AuthContext";
+import { FirestoreUser, useAuth } from "@/context/AuthContext";
 import { Alchemy } from "alchemy-sdk";
 import { Token, TokenFromContract } from "@/app/dashboard/coins/api";
 import { Wallet as WalletType } from "@/lib/firestore";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+
+//Optimized trending to now be a once go on run!!
+type walletData = 
+{
+    wallets: WalletType[] | null;
+    refreshWallets: () => Promise<void>;
+};
+
+const walletContext = createContext<walletData | undefined>(undefined);
+
+export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const fetched = useRef(false);
+    const { user } = useAuth();
+    const [wallets, setWallets] = useState<WalletType[] | null>(null);
+
+    const fetchWallets = async () => 
+        {
+            try 
+            {
+                if(user)
+                {
+                    let wallets = await getWalletsFromUser(user);
+                    setWallets(wallets);
+                }
+            } 
+            catch(error) 
+            {
+                console.error("Failed to fetch wallets:", error);
+            }
+        }
+
+    useEffect(() => 
+    {
+        if(!user)
+        {
+            return;
+        }
+
+        if (fetched.current) return;
+        fetched.current = true;
+
+        fetchWallets();
+        }, [user]);
+
+    return (
+    <walletContext.Provider value={{ wallets: wallets, refreshWallets : fetchWallets }}>
+        {children}
+    </walletContext.Provider>
+    );
+};
+
+export const useWallets = () => 
+{
+    const context = useContext(walletContext);
+    if (!context) throw new Error("useWallets must be used within a WalletProvider");
+    return context;
+};
+
 
 //const POLYGON_RPC = 'https://rpc-mumbai.maticvigil.com';
 
@@ -87,7 +147,6 @@ export async function connectWalletViaExtention(user: FirestoreUser) {
                 address: accounts[0],
             };
             await addWallet(user, wallet);
-            console.log(`Wallet Connected: ${accounts[0]}`);
             return accounts[0];
         } catch (error) {
             console.error("Wallet connection failed", error);

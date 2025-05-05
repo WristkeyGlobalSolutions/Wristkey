@@ -92,6 +92,7 @@ const Favorites = () => {
 							{favoriteNFTs.map((nft, index) => (
 								<li key={index}>
 									<CoinCard
+                                        key={nft.contract_address}
 										name={nft.collection?.name ?? "N/A"}
 										thumb={nft.collection?.bannerImageUrl}
 										address={nft.contract_address}
@@ -122,6 +123,7 @@ const Favorites = () => {
 							{favoriteTokens.map((token, index) => (
 								<li key={index}>
 									<CoinCard
+                                        key={token.token_addresses.address}
 										name={token.metadata.name ?? "N/A"}
 										thumb={token.metadata.logo}
 										address={token.token_addresses.address}
