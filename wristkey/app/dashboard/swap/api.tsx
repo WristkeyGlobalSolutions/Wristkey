@@ -2,7 +2,7 @@ import { Alchemy, Network, AlchemySettings } from 'alchemy-sdk';
 import { ethers } from 'ethers';
 
 // Types
-interface SwapParams {
+export interface SwapParams {
   fromTokenAddress: string;
   toTokenAddress: string;
   amount: string;

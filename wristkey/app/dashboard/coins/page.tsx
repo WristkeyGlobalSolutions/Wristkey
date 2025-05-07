@@ -18,9 +18,6 @@ export default function Coins() {
     const {trending_tokens, trending_nfts} = API.useTrending();
 	const [networkid, setNetworkID] = useState<string | null>(null);
 
-	const [searchNFT, setSearchNFT] = useState<
-		API.NFTCollection | undefined | null
-	>(null);
 	const [searchToken, setSearchToken] = useState<
 		API.Token | undefined | null
 	>(null);
@@ -28,25 +25,20 @@ export default function Coins() {
 	async function handleSearch(event: React.KeyboardEvent<HTMLInputElement>) {
 		if (
 			event.code == "Enter" &&
-			event.currentTarget.id == "TokenNFTSearchBar"
+			event.currentTarget.id == "TokenSearchBar"
 		) {
 			const alchemy = new Alchemy(settings);
 			const input = (
-				document.getElementById("TokenNFTSearchBar") as HTMLInputElement
+				document.getElementById("TokenSearchBar") as HTMLInputElement
 			).value;
+
+        
 			const token = await API.TokenFromContract(alchemy, input);
-			const collection = await API.NFTFromContract(alchemy, input);
 
 			if (token) {
 				setSearchToken(token);
 			} else {
 				setSearchToken(null);
-			}
-
-			if (collection) {
-				setSearchNFT(collection);
-			} else {
-				setSearchNFT(null);
 			}
 		}
 	}
@@ -89,8 +81,8 @@ export default function Coins() {
 							</label>
 							<input
 								type="text"
-								id="TokenNFTSearchBar"
-								name="TokenNFTSearchBar"
+								id="TokenSearchBar"
+								name="TokenSearchBar"
 								className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
 								placeholder="Search by Contract Address..."
 								style={{ color: "black" }}
@@ -122,33 +114,7 @@ export default function Coins() {
 								)}
 							</div>
 
-							<div className="searchResult space-y-6">
-								{searchNFT ? (
-									<CoinCard
-										name={
-											searchNFT.collection?.name ?? "N/A"
-										}
-										thumb={
-											searchNFT.collection?.bannerImageUrl
-										}
-										address={searchNFT.contract_address}
-										price={`${
-											(
-												searchNFT.floor_pricing
-													.openSea as FloorPriceMarketplace
-											).floorPrice
-										}${
-											(
-												searchNFT.floor_pricing
-													.openSea as FloorPriceMarketplace
-											).priceCurrency
-										}`}
-										identifier={"nft"}
-									/>
-								) : (
-									<p></p>
-								)}
-							</div>
+		
 						</div>
 
 						<div>

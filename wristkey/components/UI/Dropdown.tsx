@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext"; // Adjust the path as needed
 import { useRouter } from "next/navigation";
@@ -14,7 +15,6 @@ let alchemy : Alchemy;
 
 interface DropdownProps 
 {
-    //This for some reason resets the prop
     onSelect: (selectedAddress: string, selectedAsset: asset) => void;
 }
 
@@ -74,6 +74,8 @@ const Dropdown: React.FC<DropdownProps> = ({onSelect}) => {
         //this is currently broken
 		setSelectedCoin(name);   // Update button text
 		setIsOpen(false);        // Close dropdown
+
+        //This is resetting the prop, but we need it so we can access the token data
         onSelect(name, asset);
 	};
 

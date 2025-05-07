@@ -1,28 +1,47 @@
-"use client";
+"use client"
 import React, { useEffect, useState } from 'react';
 import WalletNav from "@/components/UI/WalletNav";
-import Dropdown from "@/components/UI/Dropdown";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { asset } from '../portfolio/api';
+import { getSwapQuoteReadOnly, SwapParams } from './api';
+import FromDropdown from '@/components/UI/FromDropdown';
+import ToDropdown from '@/components/UI/ToDropdown';
 
 
 const Swap = () => {
 
-    const { user, refreshUser } = useAuth();
-    const [amount, setAmount] = useState(0);
-    const [balance, setBalance] = useState(0);
+    //const { user, refreshUser } = useAuth();
+    const [fromAmount, setFromAmount] = useState(0); //amount currently typed into FromBox
+    const [toAmount, setToAmount] = useState(0); //amount converted to ToBox
+
+    const [balance, setBalance] = useState(0); //balance of asset selected in FromBox
     const [isSwapped, setIsSwapped] = useState(false);
     const [message, setMessage] = useState("");
 
-    const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
-    const [selectedAsset, setSelectedAsset] = useState<asset | null>(null);
+    //Asset we will swap to
+    const [toAsset, setToAsset] = useState<[string, asset] | null>(null);
+    
+    //Asset we are swapping with
+    const [fromAsset, setFromAsset] = useState<[string, asset] | null>(null);
 
-    const handleDropdownSelect = (address: string, asset: asset) => 
+    const handleToDropdownSelect = (name: string, asset: asset) => 
     {
-        setSelectedAddress(address);
-        setSelectedAsset(asset);
+        setToAsset([name, asset]);
+        console.log("From asset " + name);
     }
+
+    const handleFromDropdownSelect = (name: string, asset: asset) => 
+    {
+        setFromAsset([name, asset]);
+        setBalance(parseFloat(asset.balance ?? "0")); //Set the balance on From update
+        console.log("To asset " + name);
+    }
+
+    useEffect(() => {
+
+    }, [fromAmount]
+    )
 
     const parse = (val: string) => 
     {
@@ -35,17 +54,8 @@ const Swap = () => {
     {
         if (val === "") 
         {
-            setAmount(0);
+            setFromAmount(0);
             return;
-        }
-
-        if(selectedAsset && selectedAsset.balance)
-        {
-            setBalance(parseFloat(selectedAsset.balance));
-        }
-        else
-        {
-            setBalance(0);
         }
 
         const num = parse(val);
@@ -53,29 +63,44 @@ const Swap = () => {
 
         if (updated <= balance) 
         {
-            setAmount(updated);
+            setFromAmount(updated);
         }
     };
 
- const mainValue = amount || 0;
- const secondaryValue = isSwapped ? mainValue * 2 : mainValue / 2;
+ const mainValue = fromAmount || 0;
 
  // Shared box UI
- const Box = ({
-    value,
-    onChange,
-    balance,
-    isMainBox,
-  }: {
+ const ToBox = ({value, onChange, isMainBox}: 
+    {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    isMainBox: boolean;
+    }) => (
+    <div className="bg-white border-2 border-gray-300 rounded-2xl h-20 px-4 py-2 flex items-center justify-between">
+      <div>
+        {/* Dynamically switch dropdown options based on isSwapped */}
+        <ToDropdown onSelect={handleToDropdownSelect}/>
+      </div>
+      <input
+        type="text"
+        value={value}
+        onChange={onChange}
+        className="text-gray-400 text-3xl text-right w-20 focus:outline-none bg-transparent"
+      />
+    </div>
+  );
+
+  const FromBox = ({value, onChange, balance, isMainBox}: 
+    {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     balance: number;
     isMainBox: boolean;
-  }) => (
+    }) => (
     <div className="bg-white border-2 border-gray-300 rounded-2xl h-20 px-4 py-2 flex items-center justify-between">
       <div>
         {/* Dynamically switch dropdown options based on isSwapped */}
-        <Dropdown onSelect={handleDropdownSelect}/>
+        <FromDropdown onSelect={handleFromDropdownSelect}/>
         <p className="text-sm text-gray-500 mt-1">Balance: {balance}</p>
       </div>
       <input
@@ -102,17 +127,16 @@ const Swap = () => {
             {/* Top Box (changes with swap) */}
             <p>Pay with: </p>
             {!isSwapped ? (
-                <Box
-                value={amount.toString()}
+                <FromBox
+                value={fromAmount.toString()}
                 onChange={(e) => handleChange(e.target.value, true)}
                 balance={balance}
                 isMainBox={true}
                 />
             ) : (
-                <Box
-                value={(amount / 2).toString()}
+                <ToBox
+                value={toAmount.toString()}
                 onChange={(e) => handleChange(e.target.value, false)}
-                balance={balance}
                 isMainBox={false}
                 />
             )}
@@ -129,16 +153,15 @@ const Swap = () => {
 
             {/* Bottom Box (changes with swap) */}
             <p>Recieve: </p>
-            {isSwapped ? (
-                <Box
-                value={amount.toString()}
+            {!isSwapped ? (
+                <ToBox
+                value={toAmount.toString()}
                 onChange={(e) => handleChange(e.target.value, true)}
-                balance={balance}
                 isMainBox={true}
                 />
             ) : (
-                <Box
-                value={(amount / 2).toString()}
+                <FromBox
+                value={fromAmount.toString()}
                 onChange={(e) => handleChange(e.target.value, false)}
                 balance={balance}
                 isMainBox={false}

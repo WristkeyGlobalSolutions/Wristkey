@@ -195,19 +195,25 @@ export async function TokenFromContract(alchemy : Alchemy, address : string) : P
 
     try
     {
-        token_pricing = (await alchemy.prices.getTokenPriceByAddress(
-        [{network: Network.ETH_MAINNET, address: address}])).data[0];
+        //token_pricing = (await alchemy.prices.getTokenPriceByAddress(
+        //[{network: Network.ETH_MAINNET, address: address}])).data[0];
         
         //TODO : UNCOMMENT THIS!!!!!!!!!!!!!!!!
         //placeholder as this call has limits
-        /*
+        //this will lead to more errors but will let you run without running out of API calls
+        
         token_pricing = {    
             network: "network test",
             address: "address placeholder",
-            prices: [],
+            prices: [{
+                currency: "0",
+                value: "0",
+                lastUpdatedAt: "0"
+            }],
             error: null
         };
-        */
+        
+        
     }
     catch(error)
     {
@@ -263,23 +269,10 @@ export async function NFTFromContract(alchemy : Alchemy, address : string) : Pro
     }   
 }
 
-export async function ALCsearch(alchemy : Alchemy, input : string) : Promise<Token | NFTCollection | undefined>
+export async function ALCsearch(alchemy : Alchemy, input : string) : Promise<Token | undefined>
 {
     let token = await TokenFromContract(alchemy, input);
-
-    if(!token)
-    {
-        let nft = await NFTFromContract(alchemy, input);
-
-        if(nft)
-        {
-            return nft;
-        }
-    }
-    else
-    {
-        return token;
-    }
+    return token;
 }
 
 //Be careful with how many hours you call our from! This can take a while
@@ -304,8 +297,6 @@ export async function getTrendingTokenList(alchemy : Alchemy, splice : number, c
             continue;
         }
 
-        //TODO: UNCOMMENT THIS WHEN YOU WENT RELIABLE DATA
-        //This value is the USD used to preview the price, we need it
         if(!token.token_addresses || !token.token_addresses.prices[0])
         {
             continue;

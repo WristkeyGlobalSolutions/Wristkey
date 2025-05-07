@@ -9,6 +9,7 @@ export type asset = {
     value: number;
     change: number;
     percentage: string;
+    address : string;
 };
 
 export async function get_wallet_data(user : FirestoreUser | null, alchemy : Alchemy, wallets : WalletType[] | null) : Promise<Map<string, asset> | null>
@@ -54,6 +55,7 @@ export async function get_wallet_data(user : FirestoreUser | null, alchemy : Alc
                     ) * parseFloat(token_data.get(keys[i]) ?? "0"),
                 change: 0,
                 percentage: "0%",
+                address: keys[i].token_addresses.address
             });
         }
         
