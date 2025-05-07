@@ -1,10 +1,9 @@
 "use client"
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useContext, createContext } from "react";
 import { useAuth } from "@/context/AuthContext"; // Adjust the path as needed
 import { useRouter } from "next/navigation";
 import { Alchemy, Network } from "alchemy-sdk";
-import { asset, get_wallet_data } from "@/app/dashboard/portfolio/api";
-import { useWallets } from "@/app/dashboard/mining/managewallets/api";
+import { asset } from "@/app/dashboard/portfolio/api";
 
 const settings = {
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
@@ -13,12 +12,40 @@ const settings = {
 
 let alchemy : Alchemy;
 
-interface DropdownProps 
+const to_asset : Map<string, asset> = new Map();
+
+type dropdownData =
 {
-    onSelect: (selectedName: string, selectedAsset: asset) => void;
+    toName : string | null,
+    toAsset : asset | null,
+    setToDropdown: (name : string, asset : asset) => void;
 }
 
-const to_asset : Map<string, asset> = new Map();
+const ToDropdownContext = createContext<dropdownData | undefined>(undefined);
+
+export const ToDropdownProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [assetName, setAssetName] = useState<string | null>(null);
+    const [asset, setAsset] = useState<asset | null>(null);
+
+    const update = async (name : string, asset : asset) => 
+    {
+        setAssetName(name);
+        setAsset(asset);
+    }
+
+    return (
+    <ToDropdownContext.Provider value={{ toName: assetName, toAsset : asset, setToDropdown : update}}>
+        {children}
+    </ToDropdownContext.Provider>
+    );
+};
+
+export const useToDropdown = () => 
+{
+    const context = useContext(ToDropdownContext);
+    if (!context) throw new Error("useToDropdown must be used within a ToDropdownProvider");
+    return context;
+};
 
 /*
 TODO: Look up these in the API
@@ -55,14 +82,14 @@ to_asset.set("ETH 2.0",
         address: "0xFbE6F37d3db3fc939F665cfe21238c11a5447831"
     });
 
-const ToDropdown: React.FC<DropdownProps> = ({onSelect}) => {
-
-    const {wallets, refreshWallets} = useWallets();
+const ToDropdown: React.FC = () => {
     const { user, logout } = useAuth();
     const router = useRouter();
+    const{toName, toAsset, setToDropdown} = useToDropdown();
 
+    const[dropdownProperties, setdropdownProperties] = useState<Map<string, asset>>(to_asset);
     const [isOpen, setIsOpen] = useState(false); // State to toggle the dropdown
-    const [selectedCoin, setSelectedCoin] = useState<string | null>("(Select coin)");
+    const [selectedCoin, setSelectedCoin] = useState<string>(toName ?? "(Select coin)");
 
 	// Function to toggle the dropdown visibility
 	const toggleDropdown = () => {
@@ -94,12 +121,8 @@ const ToDropdown: React.FC<DropdownProps> = ({onSelect}) => {
 	}, []);
 
 	const handleItemClick = (name: string, asset : asset) => {
-        //this is currently broken
-		setSelectedCoin(name);   // Update button text
 		setIsOpen(false);        // Close dropdown
-
-        //This is resetting the prop, but we need it so we can access the token data
-        onSelect(name, asset);
+        setToDropdown(name, asset);
 	};
 
 	return (
@@ -115,7 +138,7 @@ const ToDropdown: React.FC<DropdownProps> = ({onSelect}) => {
 			{isOpen && (
 				<div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 shadow-lg z-10">
 					<ul className="py-2">
-                        {Array.from(to_asset.entries()).map(([name, asset]) => (
+                        {dropdownProperties && Array.from(dropdownProperties.entries()).map(([name, asset]) => (
 							<li key={name}>
 								<span
 									onClick={() => handleItemClick(name, asset)}

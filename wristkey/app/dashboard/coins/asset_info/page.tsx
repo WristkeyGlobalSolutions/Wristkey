@@ -2,7 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import * as API from "../api";
-import { Alchemy, Network } from "alchemy-sdk";
+import { Alchemy, FloorPriceMarketplace, Network } from "alchemy-sdk";
 import { useAuth } from "@/context/AuthContext";
 import {
 	addFavoriteToUser,
@@ -26,6 +26,7 @@ export default function AssetInfo() {
 		null
 	);
 	const [favorited, setFavorited] = useState<boolean>(false);
+    const [price, setPrice] = useState<number>(0);
 
 	const { user } = useAuth();
 	const type = useSearchParams().get("type");
@@ -56,12 +57,26 @@ export default function AssetInfo() {
 						asset = await API.NFTFromContract(alchemy, address);
 						setNft(asset);
 						setAssetAddress(asset?.contract_address);
+                        if(asset && asset.contract_address)
+                        {
+                            let price = ((await API.NFTFLoorPriceFromContract(alchemy, asset.contract_address)));
+                            if(price) setPrice(price.floorPrice);  
+                        } 
 					} catch (e) {}
 				} else if (type == "token") {
 					try {
 						asset = await API.TokenFromContract(alchemy, address);
 						setToken(asset);
-						setAssetAddress(asset?.token_addresses.address);
+						setAssetAddress(asset?.contract_address);
+                        if(asset)
+                        {
+                            let price = (await API.TokenPriceFromContract(alchemy, asset.contract_address));
+
+                            if(price)
+                            {
+                                setPrice(price);
+                            }
+                        }
 					} catch (e) {}
 				}
 				const favorites = await getFavoritesForUser(user);
@@ -137,14 +152,14 @@ export default function AssetInfo() {
 					</button>
 
 					<div className="mt-6">
-						{!assetDescription && (
-							<p className="text-gray-500">No Description</p>
+						{!price && (
+							<p className="text-gray-500">No Price</p>
 						)}
 
-						{assetDescription && (
+						{price && (
 							<div>
 								<p className="text-gray-700">
-									{assetDescription}
+									{price}
 								</p>
 							</div>
 						)}

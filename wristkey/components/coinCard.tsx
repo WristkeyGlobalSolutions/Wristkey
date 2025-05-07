@@ -5,7 +5,7 @@ interface CoinCardProps
 {
 	thumb: string | undefined | null;
 	name: string | undefined | null;
-	price: string;
+	price?: string; //made optional
 	volume?: string; // Optional prop for volume
     identifier? : string;
     address? : string;

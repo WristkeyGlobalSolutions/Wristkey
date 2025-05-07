@@ -1,47 +1,76 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import WalletNav from "@/components/UI/WalletNav";
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
-import { asset } from '../portfolio/api';
-import { getSwapQuoteReadOnly, SwapParams } from './api';
-import FromDropdown from '@/components/UI/FromDropdown';
-import ToDropdown from '@/components/UI/ToDropdown';
+import ToDropdown, { ToDropdownProvider, useToDropdown } from '@/components/UI/ToDropdown';
+import FromDropdown, { FromDropdownProvider, useFromDropdown } from "@/components/UI/FromDropdown";
+import { TokenPriceFromContract, TokenFromContract } from '../coins/api';
+import { Alchemy, Network } from 'alchemy-sdk';
+import { ethers } from 'ethers';
+import { useWallets } from '../mining/managewallets/api';
+import { Wallet } from '@/lib/firestore';
 
+const settings = {
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+    network: Network.ETH_MAINNET,
+};
 
-const Swap = () => {
+let alchemy : Alchemy;
 
-    //const { user, refreshUser } = useAuth();
-    const [fromAmount, setFromAmount] = useState(0); //amount currently typed into FromBox
-    const [toAmount, setToAmount] = useState(0); //amount converted to ToBox
+const SwapInner = () => {
 
-    const [balance, setBalance] = useState(0); //balance of asset selected in FromBox
+    //TODO: needs input for decimals, needs to be able to check for multiple inputs
+    //i.e., when you input 10 it only accounts for the `1`
     const [isSwapped, setIsSwapped] = useState(false);
     const [message, setMessage] = useState("");
 
-    //Asset we will swap to
-    const [toAsset, setToAsset] = useState<[string, asset] | null>(null);
-    
-    //Asset we are swapping with
-    const [fromAsset, setFromAsset] = useState<[string, asset] | null>(null);
+    const{fromName, fromAsset, setFromDropdown} = useFromDropdown();
+    const{toName, toAsset, setToDropdown} = useToDropdown();
 
-    const handleToDropdownSelect = (name: string, asset: asset) => 
-    {
-        setToAsset([name, asset]);
-        console.log("From asset " + name);
-    }
+    const[fromAmount, setFromAmount] = useState(0);
+    const[fromBalance, setFromBalance] = useState(0);
+    const[toAmount, setToAmount] = useState(0); //Used to convert
 
-    const handleFromDropdownSelect = (name: string, asset: asset) => 
-    {
-        setFromAsset([name, asset]);
-        setBalance(parseFloat(asset.balance ?? "0")); //Set the balance on From update
-        console.log("To asset " + name);
-    }
+    //Default to null so that code knows when none are selected
+    const[fromAddress, setFromAddress] = useState<string | null>(null);
+    const[toAddress, setToAddress] = useState<string | null>(null);
 
+    //Set this so we know when swapping is valid
+    const[cannotSwap, setCannotSwap] = useState(false);
+
+     const{wallets, refreshWallets} = useWallets();
+
+    //Initializing useEffect
     useEffect(() => {
+        alchemy = new Alchemy(settings);
+    }, [])
 
-    }, [fromAmount]
-    )
+    //update toAsset address
+    useEffect(() => {
+        if(toAsset && toAsset.address) setToAddress(toAsset.address);
+    }, [toAsset])
+
+    /*
+        On change of fromAmount, toAddres, or fromAddress update the toAmount
+    */
+    useEffect(() => {
+        console.log("called");
+        const fetchToAmount = async() =>
+        {
+            if(toAddress && fromAddress) setToAmount(await convertCurrency(fromAmount, toAddress, fromAddress));
+        }
+
+        fetchToAmount();
+        
+    }, [fromAmount, toAddress, fromAddress])
+
+    //Update the current balance
+    useEffect(() => {
+        if(fromAsset && fromAsset.balance)  setFromBalance(parseFloat(fromAsset.balance));
+        if(fromAsset && fromAsset.address) setFromAddress(fromAsset.address);
+
+        if(!fromAsset || !fromAsset.address) setCannotSwap(false) 
+        else setCannotSwap(true)
+    }, [fromAsset])
 
     const parse = (val: string) => 
     {
@@ -61,25 +90,43 @@ const Swap = () => {
         const num = parse(val);
         const updated = isMain ? num : num * 2;
 
-        if (updated <= balance) 
+        if (updated <= fromBalance) 
         {
             setFromAmount(updated);
         }
     };
 
+    const convertCurrency = async(amount : number, fromAddress : string, toAddress : string) =>
+    {
+        //Get the prices for each token
+        let toTokenPrice = await TokenPriceFromContract(alchemy, toAddress);
+        let fromTokenPrice = await TokenPriceFromContract(alchemy, fromAddress);
+
+        //Make sure they exist
+        if(fromTokenPrice && toTokenPrice)
+        {
+            setCannotSwap(false);
+            let converted = (amount/fromTokenPrice) * toTokenPrice;
+            return converted;
+        }
+        
+        //If they do not exist make sure we know we canno
+        setCannotSwap(true);
+        return 0;
+    }
+
  const mainValue = fromAmount || 0;
 
  // Shared box UI
- const ToBox = ({value, onChange, isMainBox}: 
+ const ToBox = ({value, onChange}: 
     {
-    value: string;
+    value: number;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    isMainBox: boolean;
     }) => (
     <div className="bg-white border-2 border-gray-300 rounded-2xl h-20 px-4 py-2 flex items-center justify-between">
       <div>
         {/* Dynamically switch dropdown options based on isSwapped */}
-        <ToDropdown onSelect={handleToDropdownSelect}/>
+        <ToDropdown/>
       </div>
       <input
         type="text"
@@ -90,18 +137,17 @@ const Swap = () => {
     </div>
   );
 
-  const FromBox = ({value, onChange, balance, isMainBox}: 
+  const FromBox = ({value, onChange, balance}: 
     {
-    value: string;
+    value: number;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     balance: number;
-    isMainBox: boolean;
     }) => (
     <div className="bg-white border-2 border-gray-300 rounded-2xl h-20 px-4 py-2 flex items-center justify-between">
       <div>
         {/* Dynamically switch dropdown options based on isSwapped */}
-        <FromDropdown onSelect={handleFromDropdownSelect}/>
-        <p className="text-sm text-gray-500 mt-1">Balance: {balance}</p>
+        <FromDropdown/>
+        <p className="text-sm text-gray-500 mt-1">Balance: {fromBalance}</p>
       </div>
       <input
         type="text"
@@ -112,11 +158,20 @@ const Swap = () => {
     </div>
   );
 
-  const handleExchange = () => {
-    setMessage("Exchange made");
-    // Optional: Reset the message after 3 seconds
-    setTimeout(() => setMessage(""), 3000);
-  };
+    const handleExchange = () => 
+    {
+        if(cannotSwap)
+        {
+            setMessage("Cannot swap");
+        }
+        else
+        {
+            setMessage("Exchange made");
+        }
+
+        setTimeout(() => setMessage(""), 3000);
+
+    };
 
   return (
 	  <div className="bg-gradient-to-r from-blue-700 to-blue-950">
@@ -128,16 +183,14 @@ const Swap = () => {
             <p>Pay with: </p>
             {!isSwapped ? (
                 <FromBox
-                value={fromAmount.toString()}
+                value={fromAmount}
                 onChange={(e) => handleChange(e.target.value, true)}
-                balance={balance}
-                isMainBox={true}
+                balance={fromBalance}
                 />
             ) : (
                 <ToBox
-                value={toAmount.toString()}
+                value={toAmount}
                 onChange={(e) => handleChange(e.target.value, false)}
-                isMainBox={false}
                 />
             )}
 
@@ -155,16 +208,14 @@ const Swap = () => {
             <p>Recieve: </p>
             {!isSwapped ? (
                 <ToBox
-                value={toAmount.toString()}
+                value={toAmount}
                 onChange={(e) => handleChange(e.target.value, true)}
-                isMainBox={true}
                 />
             ) : (
                 <FromBox
-                value={fromAmount.toString()}
+                value={fromAmount}
                 onChange={(e) => handleChange(e.target.value, false)}
-                balance={balance}
-                isMainBox={false}
+                balance={fromBalance}
                 />
             )}
         
@@ -186,7 +237,16 @@ const Swap = () => {
       </div>
     </div>
   </div>
-  ); // end return
+  );
 };
+
+//Need to wrap into the providers
+const Swap = () => (
+    <FromDropdownProvider>
+        <ToDropdownProvider>
+            <SwapInner/>
+        </ToDropdownProvider>
+    </FromDropdownProvider>
+  );
 
 export default Swap;

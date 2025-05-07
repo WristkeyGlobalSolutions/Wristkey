@@ -1,6 +1,6 @@
 "use client";
 import axios from "axios";
-import {Network, Alchemy, Nft, GetFloorPriceResponse, TokenAddressRequest, TokenMetadataResponse, TokenPriceByAddressResult, AssetTransfersCategory, AssetTransfersResponse, BaseNftCollection, FloorPriceError} from "alchemy-sdk";
+import {Network, Alchemy, Nft, GetFloorPriceResponse, TokenAddressRequest, TokenMetadataResponse, TokenPriceByAddressResult, AssetTransfersCategory, AssetTransfersResponse, BaseNftCollection, FloorPriceError, FloorPriceMarketplace} from "alchemy-sdk";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ALCgetTokens } from "../mining/managewallets/api";
 
@@ -161,19 +161,18 @@ export type GeckoSearchQuery =
 export type SearchQuery =
 {
     tokens : Token[],
-    nft_collections: NFTCollection[]
+    nft_collections: NFTCollection[],
 }
 
 export type Token =
 {
     metadata: TokenMetadataResponse,
-    token_addresses: TokenPriceByAddressResult
+    contract_address : string
 };
 
 export type NFTCollection =
 {
     nfts: Nft[],
-    floor_pricing: GetFloorPriceResponse,
     contract_address: string,
     collection?: BaseNftCollection
 };
@@ -182,7 +181,6 @@ export type NFTCollection =
 export async function TokenFromContract(alchemy : Alchemy, address : string) : Promise<Token | undefined>
 {
     let token_metadata;
-    let token_pricing;
 
     try
     {
@@ -190,52 +188,46 @@ export async function TokenFromContract(alchemy : Alchemy, address : string) : P
     }
     catch(error)
     {
-        console.error("Could not obtain token metadata", error);
+        console.error("Could not obtain token metadata " + address, error);
     }
 
-    try
-    {
-        //token_pricing = (await alchemy.prices.getTokenPriceByAddress(
-        //[{network: Network.ETH_MAINNET, address: address}])).data[0];
-        
-        //TODO : UNCOMMENT THIS!!!!!!!!!!!!!!!!
-        //placeholder as this call has limits
-        //this will lead to more errors but will let you run without running out of API calls
-        
-        token_pricing = {    
-            network: "network test",
-            address: "address placeholder",
-            prices: [{
-                currency: "0",
-                value: "0",
-                lastUpdatedAt: "0"
-            }],
-            error: null
-        };
-        
-        
-    }
-    catch(error)
-    {
-        console.error("Could not obtain token pricing", error);
-    }
-
-    if(token_metadata && token_pricing)
+    if(token_metadata)
     {
         let token : Token = 
         {
             metadata: token_metadata,
-            token_addresses: token_pricing,
+            contract_address: address
         }
 
         return token;
     }
 }
 
+export async function TokenPriceFromContract(alchemy : Alchemy, address : string) : Promise<number | undefined>
+{
+    let token_pricing;
+
+    try
+    {
+        token_pricing = (await alchemy.prices.getTokenPriceByAddress(
+        [{network: Network.ETH_MAINNET, address: address}])).data[0];
+    }
+    catch(error)
+    {
+        console.error("Could not obtain token pricing", error);
+    }
+
+    if(token_pricing && token_pricing.prices && token_pricing.prices[0])
+    {
+        let f = parseFloat(token_pricing.prices[0].value);
+        return parseFloat(token_pricing.prices[0].value);
+        //return Math.round((f + Number.EPSILON) * 100) / 100;
+    }
+}
+
 export async function NFTFromContract(alchemy : Alchemy, address : string) : Promise<NFTCollection | undefined>
 {
     let nfts;
-    let floor_pricing;
 
     try
     {
@@ -246,6 +238,23 @@ export async function NFTFromContract(alchemy : Alchemy, address : string) : Pro
         console.error("Could not obtain NFT metadata", error);
     }
 
+    if(nfts)
+    {
+        let collection : NFTCollection = 
+        {
+            nfts: nfts.nfts,
+            collection: nfts.nfts[0].collection,
+            contract_address: nfts.nfts[0].contract.address
+        };
+
+        return collection;
+    }   
+}
+
+export async function NFTFLoorPriceFromContract(alchemy : Alchemy, address : string) : Promise<FloorPriceMarketplace | undefined>
+{
+    let floor_pricing;
+
     try
     {
         floor_pricing = await alchemy.nft.getFloorPrice(address);
@@ -255,18 +264,15 @@ export async function NFTFromContract(alchemy : Alchemy, address : string) : Pro
         console.error("Could not obtain token pricing", error);
     }
 
-    if(nfts && floor_pricing)
+    if(floor_pricing && floor_pricing.openSea)
     {
-        let collection : NFTCollection = 
-        {
-            nfts: nfts.nfts,
-            floor_pricing: floor_pricing,
-            collection: nfts.nfts[0].collection,
-            contract_address: nfts.nfts[0].contract.address
-        };
+        let price = floor_pricing.openSea as FloorPriceMarketplace;
 
-        return collection;
-    }   
+        if(price)
+        {
+            return price;
+        }
+    }
 }
 
 export async function ALCsearch(alchemy : Alchemy, input : string) : Promise<Token | undefined>
@@ -297,13 +303,7 @@ export async function getTrendingTokenList(alchemy : Alchemy, splice : number, c
             continue;
         }
 
-        if(!token.token_addresses || !token.token_addresses.prices[0])
-        {
-            continue;
-        }
-
         ret.push(token);
-
     }
 
     return ret;
@@ -325,12 +325,6 @@ export async function getTrendingNFTList(alchemy : Alchemy, splice : number, cou
             continue;
         }
 
-        //This value is used for the floor pricing so make sure we have it
-        if(!nft.floor_pricing || ((nft.floor_pricing.openSea as FloorPriceError).error))
-        {
-            continue;
-        }
-
         if(!nft.contract_address)
         {
             continue;
@@ -342,8 +336,8 @@ export async function getTrendingNFTList(alchemy : Alchemy, splice : number, cou
     return ret;   
 }
 
-const SAMPLE_COUNT = 20; // number of random samples
-const BLOCK_RANGE = 10; // how many blocks per sample
+const SAMPLE_COUNT = 40; // number of random samples
+const BLOCK_RANGE = 20; // how many blocks per sample
 
 async function getTrending(alchemy : Alchemy, splice : number, category : AssetTransfersCategory[], count : number, hours : number)
 {

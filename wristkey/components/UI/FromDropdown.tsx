@@ -1,9 +1,9 @@
 "use client"
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useRef, createContext } from "react";
 import { useAuth } from "@/context/AuthContext"; // Adjust the path as needed
 import { useRouter } from "next/navigation";
 import { Alchemy, Network } from "alchemy-sdk";
-import { asset, get_wallet_data } from "@/app/dashboard/portfolio/api";
+import { asset, get_wallet_data_cheap } from "@/app/dashboard/portfolio/api";
 import { useWallets } from "@/app/dashboard/mining/managewallets/api";
 
 /*
@@ -17,20 +17,50 @@ const settings = {
 
 let alchemy : Alchemy;
 
-interface DropdownProps 
+type dropdownData =
 {
-    onSelect: (selectedName: string, selectedAsset: asset) => void;
+    fromName : string | null,
+    fromAsset : asset | null,
+    setFromDropdown: (name : string, asset : asset) => void;
 }
 
-const FromDropdown: React.FC<DropdownProps> = ({onSelect}) => {
+const FromDropdownContext = createContext<dropdownData | undefined>(undefined);
+
+export const FromDropdownProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const fetched = useRef(false);
+    const [assetName, setAssetName] = useState<string | null>(null);
+    const [asset, setAsset] = useState<asset | null>(null);
+
+    const update = async (name : string, asset : asset) => 
+    {
+        setAssetName(name);
+        setAsset(asset);
+    }
+
+    return (
+    <FromDropdownContext.Provider value={{ fromName: assetName, fromAsset : asset, setFromDropdown : update}}>
+        {children}
+    </FromDropdownContext.Provider>
+    );
+};
+
+export const useFromDropdown = () => 
+{
+    const context = useContext(FromDropdownContext);
+    if (!context) throw new Error("useFromDropdown must be used within a UseFromDropdownProvider");
+    return context;
+};
+
+const FromDropdown: React.FC = () => {
 
     const {wallets, refreshWallets} = useWallets();
     const { user, logout } = useAuth();
     const router = useRouter();
+    const{fromName, fromAsset, setFromDropdown} = useFromDropdown();
 
     const[dropdownProperties, setdropdownProperties] = useState<Map<string, asset> | null>(null);
     const [isOpen, setIsOpen] = useState(false); // State to toggle the dropdown
-    const [selectedCoin, setSelectedCoin] = useState<string | null>("(Select coin)");
+    const [selectedCoin, setSelectedCoin] = useState<string | null>(fromName ?? "(Select coin)");
 
 	// Function to toggle the dropdown visibility
 	const toggleDropdown = () => {
@@ -57,7 +87,8 @@ const FromDropdown: React.FC<DropdownProps> = ({onSelect}) => {
         //Sets the dropdown to only show the tokens the user has
         async function set_tokens()
         {
-            let tokens = await get_wallet_data(user, alchemy, wallets);
+            //use this as we do not need the token cost information in this call, only the name
+            let tokens = await get_wallet_data_cheap(user, alchemy, wallets);
 
             //Populate the assets we know the user has
             if(tokens)
@@ -76,12 +107,9 @@ const FromDropdown: React.FC<DropdownProps> = ({onSelect}) => {
 
 	const handleItemClick = (name: string, asset : asset) => {
         //this is currently broken
-		setSelectedCoin(name);   // Update button text
+        setFromDropdown(name, asset);
 		setIsOpen(false);        // Close dropdown
-
-        //This is resetting the prop, but we need it so we can access the token data
-        onSelect(name, asset);
-	};
+        };
 
 	return (
 		<div className="relative dropdown">

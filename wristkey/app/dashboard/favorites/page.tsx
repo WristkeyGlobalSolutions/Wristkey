@@ -96,17 +96,6 @@ const Favorites = () => {
 										name={nft.collection?.name ?? "N/A"}
 										thumb={nft.collection?.bannerImageUrl}
 										address={nft.contract_address}
-										price={`${
-											(
-												nft.floor_pricing
-													.openSea as FloorPriceMarketplace
-											).floorPrice
-										}${
-											(
-												nft.floor_pricing
-													.openSea as FloorPriceMarketplace
-											).priceCurrency
-										}`}
 										identifier={"nft"}
 									/>
 								</li>
@@ -123,17 +112,9 @@ const Favorites = () => {
 							{favoriteTokens.map((token, index) => (
 								<li key={index}>
 									<CoinCard
-                                        key={token.token_addresses.address}
+                                        key={token.contract_address}
 										name={token.metadata.name ?? "N/A"}
 										thumb={token.metadata.logo}
-										address={token.token_addresses.address}
-										//TODO: This can error has some tokens will not have a value defined for USD!!
-										price={
-											token.token_addresses.prices[0]
-												? `${token.token_addresses.prices[0].value}${token.token_addresses.prices[0].currency}
-                                    `
-												: ""
-										}
 										identifier={"token"}
 									/>
 								</li>

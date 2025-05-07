@@ -92,21 +92,9 @@ export default function Coins() {
 							<div className="searchResult space-y-6">
 								{searchToken ? (
 									<CoinCard
-										name={
-											searchToken.metadata.name ?? "N/A"
-										}
+										name={searchToken.metadata.name ?? "N/A"}
 										thumb={searchToken.metadata.logo}
-										address={
-											searchToken.token_addresses.address
-										}
-										//Some tokens don't have a value for usd [0]
-										price={
-											searchToken.token_addresses
-												.prices[0]
-												? `${searchToken.token_addresses.prices[0].value}${searchToken.token_addresses.prices[0].currency}
-                                    `
-												: ""
-										}
+										address={searchToken.contract_address}
 										identifier={"token"}
 									/>
 								) : (
@@ -125,19 +113,10 @@ export default function Coins() {
 								<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 									{trending_tokens.map((token, index) => (
 										<CoinCard
-											key={token.token_addresses.address}
+											key={token.contract_address}
 											name={token.metadata.name ?? "N/A"}
 											thumb={token.metadata.logo}
-											address={
-												token.token_addresses.address
-											}
-											//Some tokens don't have a value for usd [0]
-											price={
-												token.token_addresses.prices[0]
-													? `${token.token_addresses.prices[0].value}${token.token_addresses.prices[0].currency}
-                                    `
-													: ""
-											}
+											address={token.contract_address}
 											identifier={"token"}
 										/>
 									))}
@@ -158,26 +137,9 @@ export default function Coins() {
 									{trending_nfts.map((nft, index) => (
 										<li key={index}>
 											<CoinCard
-												name={
-													nft.collection?.name ??
-													"N/A"
-												}
-												thumb={
-													nft.collection
-														?.bannerImageUrl
-												}
+												name={nft.collection?.name ?? "N/A"}
+												thumb={nft.collection?.bannerImageUrl}
 												address={nft.contract_address}
-												price={`${
-													(
-														nft.floor_pricing
-															.openSea as FloorPriceMarketplace
-													).floorPrice
-												}${
-													(
-														nft.floor_pricing
-															.openSea as FloorPriceMarketplace
-													).priceCurrency
-												}`}
 												identifier={"nft"}
 											/>
 										</li>
