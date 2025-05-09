@@ -42,7 +42,7 @@ const NavBar: React.FC = () => {
 							About
 						</button>
 						<button
-							onClick={() => [router.push("/"), handleClick('accessories')]}
+							onClick={() => [router.push("/accessories"), handleClick('accessories')]}
 							className={`text-gray-400 align-text-bottom text-xl py-2 px-4 ${activeTab === 'accessories' ? 'text-gray-50' : ''}`}
 						>
 							Accessories
