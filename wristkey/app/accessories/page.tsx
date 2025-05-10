@@ -17,11 +17,11 @@ export default function AccessoriesPage() {
             </div>
             <div className="columns-2 py-32">
                 <div className="flex place-content-center">
-                    <video className="rounded-lg" width={600} height={600}  controls>
+                    <video className="rounded-lg" width={600} height={600} poster="/watchPoster.JPG"  controls>
                         <source src="/videos/watchComingSoon.MP4" type="video/mp4" />
                         Your browser does not support video type. 
                     </video>
-                    <div className="absolute w-[600px] h-[337px] pointer-events-none rounded-lg bg-radial-fade"/>
+                    <div className="absolute w-[600px] h-[337px] pointer-events-none rounded-lg bg-radial-fade shadow-2xl"/>
                 </div>
                 <div className="flex flex-col items-center justify-center h-72 w-full text-center p-2">
                     <h1 className="text-2xl text-white font-bold mb-4">Coming Soon: Wearable Tech That Pays You</h1>
@@ -38,7 +38,7 @@ export default function AccessoriesPage() {
                     Introducing Our Devices:
                 </h1>
                 <div className="flex justify-between gap-20">
-                    <div className="my-20 w-80 h-40 bg-gray-400 rounded-xl text-center text-black font-semibold p-2">
+                    <div className="my-20 w-80 h-40 bg-gray-300 rounded-xl text-center text-black font-semibold p-2">
                         <p className="text-center space-y-2 my-5">
                             Wristkey Smartring
                         </p>
@@ -46,7 +46,7 @@ export default function AccessoriesPage() {
                             A secure, NFC-enabled crypto wallet ring—sleek, minimalist, and always with you.
                         </p>
                     </div>
-                    <div className="my-20 w-80 h-40 bg-gray-400 rounded-xl text-center text-black font-semibold p-2">
+                    <div className="my-20 w-80 h-40 bg-gray-300 rounded-xl text-center text-black font-semibold p-2">
                         <p className="text-center space-y-2 my-5">
                             Wristkey Smartring
                         </p>
@@ -54,7 +54,7 @@ export default function AccessoriesPage() {
                             A secure, NFC-enabled crypto wallet ring—sleek, minimalist, and always with you.
                         </p>
                     </div>
-                    <div className="my-20 w-80 h-40 bg-gray-400 rounded-xl text-center text-black font-semibold p-2">
+                    <div className="my-20 w-80 h-40 bg-gray-300 rounded-xl text-center text-black font-semibold p-2">
                         <p className="text-center space-y-2 my-5">
                             Wristkey Smartring
                         </p>

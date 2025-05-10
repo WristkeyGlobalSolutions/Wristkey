@@ -87,8 +87,25 @@ const Favorites = () => {
 				</div>
 				{activeTab === "nfts" ? (
 				<div>
+					<div className="flex columns-5 border-b py-2">
+						<p className="w-2/5">
+							Name
+						</p>
+						<p className="w-1/5">
+							Price
+						</p>
+						<p className="w-1/5">
+							Change
+						</p>
+						<p className="w-1/5">
+							Market Cap
+						</p>
+						<p className="w-1/5 text-center">
+							Favorite
+						</p>
+					</div>
 					{favoriteNFTs ? (
-						<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+						<ul>
 							{favoriteNFTs.map((nft, index) => (
 								<li key={index}>
 									<CoinCard
@@ -107,8 +124,25 @@ const Favorites = () => {
 				</div>
 				):(
 				<div className="trendingList space-y-6">
+					<div className="flex columns-5 border-b py-2">
+						<p className="w-2/5">
+							Name
+						</p>
+						<p className="w-1/5">
+							Price
+						</p>
+						<p className="w-1/5">
+							Change
+						</p>
+						<p className="w-1/5">
+							Market Cap
+						</p>
+						<p className="w-1/5 text-center">
+							Favorite
+						</p>
+					</div>
 					{favoriteTokens ? (
-						<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+						<ul>
 							{favoriteTokens.map((token, index) => (
 								<li key={index}>
 									<CoinCard
@@ -124,7 +158,7 @@ const Favorites = () => {
 						<p className="text-gray-500">No Favorite Tokens</p>
 					)}
 				</div>
-				)}
+			)}
 			</div>
 			</div>
 		</div>

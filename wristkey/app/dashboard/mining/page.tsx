@@ -13,7 +13,7 @@ const Mining = () => {
 
   return (
     <div className="bg-gradient-to-r from-blue-700 to-blue-950">
-        <div className="bg-gray-100 rounded-t-3xl p-2">
+        <div className="bg-gray-100 min-h-screen rounded-t-3xl p-2">
             <h1 className="text-4xl text-center p-2">Mining</h1>
             <WalletNav currentTab='mining'/>
         

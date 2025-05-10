@@ -55,7 +55,7 @@ export default function Coins() {
 
 	return (
 		<div className="bg-gradient-to-r from-blue-700 to-blue-950">
-			<div className="bg-gray-100 rounded-t-3xl flex h-full">
+			<div className="bg-gray-100 rounded-t-3xl flex min-h-screen">
 				<div className="w-auto md:w-1/3 lg:w-1/5 2xl:w-1/5 flex place-content-center mt-20">
 					<WalletNav currentTab="explore" />
 				</div>
@@ -67,32 +67,32 @@ export default function Coins() {
 					</div>
 					
 					<div className="py-4 w-11/12 flex justify-between">
-							<button
-								className="p-8 w-48 font-bold text-xl rounded-xl bg-gradient-to-r from-orange-300 to-orange-600"
-							>
-								Trending
-							</button>
-							<button
-								className="p-8 w-48 font-bold text-xl rounded-xl bg-gradient-to-r from-green-300 to-green-600"
-							>
-								Top Gainers
-							</button>
-							<button
-								className="p-8 w-48 font-bold text-xl rounded-xl bg-gradient-to-r from-red-300 to-red-600"
-							>
-								Top Losers
-							</button>
-							<button
-								className="p-8 w-48 font-bold text-xl rounded-xl bg-gradient-to-r from-pink-300 to-pink-600"
-							>
-								Top Favorited
-							</button>
-							<button
-								className="p-8 w-48 font-bold text-xl rounded-xl bg-gradient-to-r from-purple-300 to-purple-600"
-							>
-								Top Searched
-							</button>
-						</div>
+						<button
+							className="p-8 w-48 font-bold text-xl rounded-xl bg-gradient-to-r from-orange-300 to-orange-600"
+						>
+							Trending
+						</button>
+						<button
+							className="p-8 w-48 font-bold text-xl rounded-xl bg-gradient-to-r from-green-300 to-green-600"
+						>
+							Top Gainers
+						</button>
+						<button
+							className="p-8 w-48 font-bold text-xl rounded-xl bg-gradient-to-r from-red-300 to-red-600"
+						>
+							Top Losers
+						</button>
+						<button
+							className="p-8 w-48 font-bold text-xl rounded-xl bg-gradient-to-r from-pink-300 to-pink-600"							
+						>
+							Top Favorited
+						</button>
+						<button
+							className="p-8 w-48 font-bold text-xl rounded-xl bg-gradient-to-r from-purple-300 to-purple-600"
+						>
+							Top Searched
+						</button>
+					</div>
 
 					<div>
 						<div className="search-bar space-y-2 w-11/12">
