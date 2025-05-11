@@ -27,7 +27,7 @@ const CoinCard: React.FC<CoinCardProps> = (
     address
 }) => 
 {
-    
+
 const router = useRouter();
 const [favorited, setFavorited] = useState<boolean>(false);
 const { user } = useAuth();
@@ -49,10 +49,10 @@ const favoriteAsset = async () => {
 
 	return (
 		<div className="flex">
-		<button 
-         className="bg-transparent flex columns-5 w-full h-24 hover:bg-gray-200"
-         onClick={() => router.push(`/dashboard/coins/asset_info?type=${identifier}&address=${address}`)}
-        >
+			<button 
+        		className="bg-transparent flex columns-5 w-full h-24 hover:bg-gray-200"
+        		onClick={() => router.push(`/dashboard/coins/asset_info?type=${identifier}&address=${address}`)}
+        	>
 			<div className="flex items-center w-2/5">
 				<img
 					src={thumb as "image"}
@@ -72,29 +72,25 @@ const favoriteAsset = async () => {
 			<div className="flex items-center w-1/5">
 				<p className="">marketcap</p>
 			</div>
-			<div className="flex justify-center items-center w-1/5">
-				
-			</div>
-			
+			<div className="w-1/5"></div>
 			{volume && (
 				<p className="text-center text-gray-600">Volume: {volume}</p>
 			)}
+			</button>
 			
-			
-		</button>
-		<div className="flex absolute right-44 mt-6">
-		<button
+			<div className="flex absolute right-44 mt-6">
+				<button
 					onClick={favoriteAsset}
 					className={`w-10 h-10 flex justify-center items-center rounded-full shadow transition ${
-						favorited
-							? "bg-red-500 text-white hover:bg-red-600"
-							: "bg-gray-300 text-gray-700 hover:bg-gray-400"
+					favorited
+						? "bg-red-500 text-white hover:bg-red-600"
+						: "bg-gray-300 text-gray-700 hover:bg-gray-400"
 					}`}
 					aria-label="Favorite"
 				>
 					{favorited ? "♥" : "♡"}
 				</button>
-				</div>
+			</div>
 		</div>
 	);
 };

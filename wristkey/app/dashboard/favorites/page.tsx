@@ -69,8 +69,8 @@ const Favorites = () => {
 		<div className="bg-gradient-to-r from-blue-700 to-blue-950 h-screen">
 			<div className="bg-gray-100 rounded-t-3xl h-screen">
 			<WalletNav currentTab="favorites" />
-			<div className="mx-auto max-w-7xl p-6 w-[90%] pl-[20%]">
-				<h1 className="text-4xl text-center p-2">Favorites</h1>
+			<div className="mx-auto max-w-7xl p-6 w-[90%] pl-[12%]">
+				<h1 className="text-4xl text-center p-2 mr-44">Favorites</h1>
 				<div className="flex justify-center mt-4 mb-4">
 					<button
 					 className={`w-full py-2 text-center text-xl rounded-tl-xl hover:bg-gray-300 ${activeTab === 'tokens' ? 'bg-gray-300' : ''}`}
