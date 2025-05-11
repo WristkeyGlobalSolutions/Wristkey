@@ -142,7 +142,7 @@ export default function Coins() {
 									Market Cap
 								</p>
 								<p className="w-1/5 text-center">
-									Favorite
+									{/** This is heading for favorites part of coin card - does not currently show/work Favorite */}
 								</p>
 							</div>
 							
@@ -183,7 +183,7 @@ export default function Coins() {
 									Market Cap
 								</p>
 								<p className="w-1/5 text-center">
-									Favorite
+									{/** This is heading for favorites part of coin card - does not currently show/work Favorite */}
 								</p>
 							</div>
 							{trending_nfts ? (

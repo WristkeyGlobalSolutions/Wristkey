@@ -78,6 +78,7 @@ const favoriteAsset = async () => {
 			)}
 			</button>
 			
+			{/* This is the favroites button - does not currently work here. Does work on Asset info page.
 			<div className="flex absolute right-44 mt-6">
 				<button
 					onClick={favoriteAsset}
@@ -90,7 +91,7 @@ const favoriteAsset = async () => {
 				>
 					{favorited ? "♥" : "♡"}
 				</button>
-			</div>
+			</div>*/}
 		</div>
 	);
 };

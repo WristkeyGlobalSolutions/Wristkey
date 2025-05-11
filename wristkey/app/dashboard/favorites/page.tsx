@@ -101,7 +101,7 @@ const Favorites = () => {
 							Market Cap
 						</p>
 						<p className="w-1/5 text-center">
-							Favorite
+							{/** This is heading for favorites part of coin card - does not currently show/work Favorite */}
 						</p>
 					</div>
 					{favoriteNFTs ? (
@@ -138,7 +138,7 @@ const Favorites = () => {
 							Market Cap
 						</p>
 						<p className="w-1/5 text-center">
-							Favorite
+							{/** This is heading for favorites part of coin card - does not currently show/work Favorite */}
 						</p>
 					</div>
 					{favoriteTokens ? (
