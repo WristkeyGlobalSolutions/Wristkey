@@ -53,7 +53,6 @@ const SwapInner = () => {
         On change of fromAmount, toAddres, or fromAddress update the toAmount
     */
     useEffect(() => {
-        console.log("called");
         const fetchToAmount = async() =>
         {
             if(toAddress && fromAddress) setToAmount(await convertCurrency(fromAmount, toAddress, fromAddress));

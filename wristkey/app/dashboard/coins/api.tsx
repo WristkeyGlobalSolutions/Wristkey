@@ -220,8 +220,7 @@ export async function TokenPriceFromContract(alchemy : Alchemy, address : string
     if(token_pricing && token_pricing.prices && token_pricing.prices[0])
     {
         let f = parseFloat(token_pricing.prices[0].value);
-        return parseFloat(token_pricing.prices[0].value);
-        //return Math.round((f + Number.EPSILON) * 100) / 100;
+        return f;
     }
 }
 

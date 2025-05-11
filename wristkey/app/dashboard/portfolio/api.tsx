@@ -71,37 +71,41 @@ export async function get_wallet_data(user : FirestoreUser | null, alchemy : Alc
 
         const assetMap = new Map<string, asset>();
 
-        if (wallets) 
-            {
-            for (let i = 0; i < wallets.length; i++) {
-                let tokens = await ALCgetTokens(alchemy, wallets[i].address);
-                wallet_data.set(wallets[i].address, tokens);
+        for (let i = 0; i < wallets.length; i++) 
+        {
+            let tokens = await ALCgetTokens(alchemy, wallets[i].address);
+            wallet_data.set(wallets[i].address, tokens);
 
-                //Get the total for this token's amount
-                tokens.forEach((data: [Token, string]) => {
-                    if (token_data.has(data[0])) {
-                        token_data.set(
-                            data[0],
-                            `${
-                                parseFloat(
-                                    token_data.get(data[0]) as string
-                                ) + parseFloat(data[1] as string)
-                            }`
-                        );
-                    } else {
-                        token_data.set(data[0], data[1]);
-                    }
-                });
-            }
+            //Get the total for this token's amount
+            tokens.forEach((data: [Token, string]) => 
+            {
+                if (token_data.has(data[0])) 
+                {
+                    token_data.set(data[0],
+                        `${
+                            parseFloat(
+                                token_data.get(data[0]) as string) 
+                                + parseFloat(data[1] as string)
+                        }`
+                    );
+                } else {
+                    token_data.set(data[0], data[1]);
+                }
+            });
         }
 
+        //Convert tokens to usd
         let keys = Array.from(token_data.keys());
-        for (let i = 0; i < token_data.size; i++) {
+        for (let i = 0; i < token_data.size; i++) 
+        {
+            let balance = token_data.get(keys[i]);
+            let token_cost = ((await TokenPriceFromContract(alchemy, keys[i].contract_address)) ?? 0.0);
+            let token_amount = parseFloat(token_data.get(keys[i]) ?? "0.0");
+            let value = token_cost * token_amount;
+
             assetMap.set(keys[i].metadata.name ?? "N/A", {
-                balance: token_data.get(keys[i]),
-                value:
-                    (await TokenPriceFromContract(alchemy, keys[i].contract_address)) ?? 0
-                     * parseFloat(token_data.get(keys[i]) ?? "0"),
+                balance: balance,
+                value: value,
                 change: 0,
                 percentage: "0%",
                 address: keys[i].contract_address
@@ -112,4 +116,23 @@ export async function get_wallet_data(user : FirestoreUser | null, alchemy : Alc
     }
 
     return null;
+}
+
+export function sumUpAllTokens(assetMap : Map<string, asset>) : number
+{
+    let sum : number = 0;
+    let tokens = Array.from(assetMap.keys());
+
+    for(let i = 0; i < tokens.length; i++)
+    {
+        sum += parseFloat(tokens[i]);
+    }
+
+    return sum;
+}
+
+export function roundToDigit(num: number, digits: number): number 
+{
+    const multiplier = Math.pow(10, digits);
+    return Math.round(num * multiplier) / multiplier;
 }

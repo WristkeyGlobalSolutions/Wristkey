@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Alchemy, Network } from "alchemy-sdk";
 import { Token } from "../coins/api";
-import { asset, get_wallet_data } from "./api";
+import { asset, get_wallet_data, sumUpAllTokens } from "./api";
 
 const settings = {
 	apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
@@ -20,6 +20,8 @@ const Portfolio = () => {
 		null
 	);
 
+    const[wallet_sum, updateWalletSum] = useState("$0.0");
+
     const{wallets, refreshWallets} = useWallets();
 
 	const handleClick = (page: "mywallet" | "nfts") => {
@@ -29,7 +31,9 @@ const Portfolio = () => {
 	useEffect(() => {
 		async function connectWallets() 
         {	
-			updateWalletData(await get_wallet_data(user, alchemy, wallets));
+            let wallet_data = await get_wallet_data(user, alchemy, wallets);
+			updateWalletData(wallet_data);
+            if(wallet_data) updateWalletSum("$" + (sumUpAllTokens(wallet_data) ?? "0.0"));
 		}
 
 		const alchemy = new Alchemy(settings);
