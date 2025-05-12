@@ -120,12 +120,12 @@ export async function get_wallet_data(user : FirestoreUser | null, alchemy : Alc
 
 export function sumUpAllTokens(assetMap : Map<string, asset>) : number
 {
-    let sum : number = 0;
-    let tokens = Array.from(assetMap.keys());
+    let sum : number = 0.0;
+    let tokens = Array.from(assetMap.values());
 
     for(let i = 0; i < tokens.length; i++)
     {
-        sum += parseFloat(tokens[i]);
+        sum += tokens[i].value;
     }
 
     return sum;

@@ -33,7 +33,7 @@ const Portfolio = () => {
         {	
             let wallet_data = await get_wallet_data(user, alchemy, wallets);
 			updateWalletData(wallet_data);
-            if(wallet_data) updateWalletSum("$" + (sumUpAllTokens(wallet_data) ?? "0.0"));
+            if(wallet_data) updateWalletSum("$" + (sumUpAllTokens(wallet_data).toFixed(2) ?? "0.0"));
 		}
 
 		const alchemy = new Alchemy(settings);
