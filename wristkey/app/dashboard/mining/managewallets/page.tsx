@@ -7,7 +7,6 @@ import { useAuth } from "@/context/AuthContext";
 import { getWalletsFromUser, Wallet } from "@/lib/firestore";
 import { PlusIcon } from '@heroicons/react/24/solid';
 import * as wallet from "./api";
-import { connectNetwork } from "@/utils/network";
 
 const ManageWallets = () => {
     const {wallets, refreshWallets} = wallet.useWallets();
@@ -60,7 +59,6 @@ const ManageWallets = () => {
 	
 	useEffect(() => {
 		console.log("User in ManageWallets:", user);
-		connectNetwork();
 		if (!user) return;
 	}, [user]);
 

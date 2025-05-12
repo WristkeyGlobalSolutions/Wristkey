@@ -56,10 +56,10 @@ const Portfolio = () => {
 			{/* Header */}
 			<div className="transparent p-8">
 				<h1 className="text-white text-center font-bold text-7xl">
-					$210,101
+					{wallet_sum}
 				</h1>
 				<h1 className="text-center text-3xl text-green-500">
-					+2.5%
+					
 				</h1>
 			</div>
 			<div className="bg-gray-100 rounded-t-3xl p-2">

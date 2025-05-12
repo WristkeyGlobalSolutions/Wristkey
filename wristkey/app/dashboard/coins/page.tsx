@@ -16,7 +16,6 @@ const settings = {
 
 export default function Coins() {
     const {trending_tokens, trending_nfts} = API.useTrending();
-	const [networkid, setNetworkID] = useState<string | null>(null);
 
 	const [searchToken, setSearchToken] = useState<
 		API.Token | undefined | null
@@ -45,12 +44,9 @@ export default function Coins() {
 
 	//Anything updated on startup should go here
 	useEffect(() => {
-		const fetchNetwork = async () => {
-			setNetworkID(await network.connectNetwork());
-		};
 
 		alchemy = new Alchemy(settings);
-		fetchNetwork();
+
 	}, []);
 
 	return (
