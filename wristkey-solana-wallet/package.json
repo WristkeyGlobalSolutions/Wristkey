@@ -1,0 +1,60 @@
+{
+  "name": "wristkey-solana-wallet",
+  "version": "1.0.0",
+  "description": "WristKey Global Solana Testnet Wallet - Enhanced demo with copy trading features",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "export": "next export"
+  },
+  "keywords": [
+    "solana",
+    "wallet",
+    "cryptocurrency",
+    "testnet",
+    "copy-trading",
+    "wristkey",
+    "blockchain"
+  ],
+  "author": "WristKey Global Solutions",
+  "license": "MIT",
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@solana/web3.js": "^1.87.6",
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-adapter-react-ui": "^0.9.35",
+    "@solana/wallet-adapter-wallets": "^0.19.32",
+    "lucide-react": "^0.503.0",
+    "next": "^15.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^3.4.1",
+    "axios": "^1.8.4",
+    "qrcode": "^1.5.4",
+    "bs58": "^5.0.0",
+    "buffer": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19",
+    "@types/qrcode": "^1.5.5",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.7",
+    "postcss": "^8",
+    "typescript": "^5",
+    "autoprefixer": "^10.4.16"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wristkey-global/solana-wallet-demo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wristkey-global/solana-wallet-demo/issues"
+  },
+  "homepage": "https://github.com/wristkey-global/solana-wallet-demo#readme"
+}
