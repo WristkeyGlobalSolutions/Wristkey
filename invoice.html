@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice WGS-2025-001</title>
+    <style>
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.4;
+            color: #333;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+        }
+        
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #2c5aa0;
+            padding-bottom: 20px;
+        }
+        
+        .company-info {
+            flex: 1;
+        }
+        
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c5aa0;
+            margin-bottom: 5px;
+        }
+        
+        .invoice-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c5aa0;
+            text-align: right;
+        }
+        
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .bill-to, .invoice-info {
+            flex: 1;
+        }
+        
+        .bill-to {
+            margin-right: 40px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c5aa0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        
+        .event-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2c5aa0;
+        }
+        
+        .event-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c5aa0;
+            margin-bottom: 10px;
+        }
+        
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .services-table th {
+            background-color: #2c5aa0;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .services-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+        
+        .services-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .total-section {
+            text-align: right;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        
+        .total-amount {
+            font-weight: bold;
+            color: #2c5aa0;
+            font-size: 24px;
+            border-top: 2px solid #2c5aa0;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        
+        .partnership-perks {
+            margin-top: 30px;
+        }
+        
+        .perks-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .perk-item {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            border-left: 3px solid #2c5aa0;
+            font-size: 13px;
+        }
+        
+        .perk-title {
+            font-weight: bold;
+            color: #2c5aa0;
+            margin-bottom: 3px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2c5aa0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .print-button:hover {
+            background: #1e3f73;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button no-print" onclick="window.print()">Print Invoice</button>
+    
+    <div class="invoice-header">
+        <div class="company-info">
+            <div class="company-name">Wristkey Global Solutions</div>
+            <div>(WGS)</div>
+        </div>
+        <div class="invoice-title">INVOICE</div>
+    </div>
+    
+    <div class="invoice-details">
+        <div class="bill-to">
+            <div class="section-title">BILL TO:</div>
+            <strong>Matthew Karsten</strong><br>
+            ZetaChain<br>
+            matthew.karsten@zetachain.com<br>
+            invoice@zetachain.com
+        </div>
+        <div class="invoice-info">
+            <div class="section-title">INVOICE DETAILS:</div>
+            <strong>Invoice #:</strong> WGS-2025-001<br>
+            <strong>Invoice Date:</strong> August 12, 2025<br>
+            <strong>Event Date:</strong> August 12, 2025
+        </div>
+    </div>
+    
+    <div class="event-info">
+        <div class="event-title">Taco Tech Tuesday - ETH NYC Week Event</div>
+        <strong>Event Date:</strong> August 12, 2025
+    </div>
+    
+    <table class="services-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th style="width: 60px;">Qty</th>
+                <th style="width: 100px;">Unit Price</th>
+                <th style="width: 100px;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <strong>Sponsorship Fee</strong><br>
+                    Branding & promotion during ETH NYC Week, including developer-focused activation, official co-host role, turnkey activation setup & breakdown, Solana invitation, ongoing weekly activations, inclusion in ETH Global & ETH NYC official calendar, hosting hackathons at several locations, warm introductions to partner networks, and on-site microphone shoutouts
+                </td>
+                <td style="text-align: center;">1</td>
+                <td style="text-align: right;">$1,000.00</td>
+                <td style="text-align: right;">$1,000.00</td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Swag Distribution</strong><br>
+                    Display and distribute ZetaChain-provided merchandise
+                </td>
+                <td style="text-align: center;">1</td>
+                <td style="text-align: right;">$0.00</td>
+                <td style="text-align: right;">$0.00</td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Banner Display</strong><br>
+                    Display ZetaChain-provided banner on-site
+                </td>
+                <td style="text-align: center;">1</td>
+                <td style="text-align: right;">$0.00</td>
+                <td style="text-align: right;">$0.00</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="total-section">
+        <div class="total-amount">
+            <strong>Total Due: $1,000.00</strong>
+        </div>
+    </div>
+    
+    <div class="partnership-perks">
+        <div class="section-title">PARTNERSHIP PERKS INCLUDED:</div>
+        <div class="perks-list">
+            <div class="perk-item">
+                <div class="perk-title">Audience Reach</div>
+                Access to a curated network of top ETH NYC Week attendees
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">Brand Visibility</div>
+                Logo placement across event assets, social media blasts, and ETH NYC Luma calendar listing
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">On-Site Presence</div>
+                Banner display and swag distribution to maximize brand touchpoints
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">Developer-Focused Activation</div>
+                Curated programming and engagement opportunities tailored for developer participation
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">Official Co-Host Recognition</div>
+                Joint branding and equal visibility as an official event co-host
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">Turnkey Event Management</div>
+                Full setup and breakdown services for smooth activation execution
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">Extended Engagement</div>
+                Invitations to Solana-focused gatherings and other weekly activations for sustained visibility
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">Official Calendar Presence</div>
+                Listing on ETH Global, ETH NYC, and other partner hackathon calendars for maximum exposure
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">Hackathon Hosting</div>
+                Organizing and hosting hackathons in collaboration with partners
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">Warm Partner Introductions</div>
+                Personal introductions to key ecosystem builders, sponsors, and collaborators
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">Microphone Shoutouts</div>
+                Live acknowledgments throughout the event to highlight the brand's presence and contributions
+            </div>
+            <div class="perk-item">
+                <div class="perk-title">Networking Opportunities</div>
+                Direct connections to key industry leaders and Web3 innovators
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p><strong>Payment Terms:</strong> Net 30 days from invoice date</p>
+        <p><strong>Thank you for your business!</strong> We look forward to a successful partnership at the Taco Tech Tuesday event.</p>
+        <p style="text-align: center; margin-top: 20px; color: #2c5aa0;"><strong>Wristkey Global Solutions (WGS)</strong></p>
+    </div>
+</body>
+</html>
